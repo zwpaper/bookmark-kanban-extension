@@ -66,6 +66,19 @@ export class ModalManager {
       </div>
     `;
 
+    // 添加键盘事件处理
+    const titleInput = modal.querySelector('#bookmarkTitle');
+    const urlInput = modal.querySelector('#bookmarkUrl');
+    
+    // 阻止输入框中的回退键触发历史导航
+    [titleInput, urlInput].forEach(input => {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value) {
+          e.preventDefault();
+        }
+      });
+    });
+
     return modal;
   }
 
