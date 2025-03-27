@@ -2,6 +2,8 @@
 
 A Chrome extension that displays your bookmarks in a visual kanban board layout, making it easier to organize and manage your bookmarks.
 
+![Bookmark Kanban Screenshot](screenshots/screenshot_bookmark_kanban.png)
+
 ## Features
 
 - 📋 Visual kanban board layout for bookmarks
