@@ -148,6 +148,14 @@ Chen Yifeng
 
 ## Version History
 
+
+- 0.1.1
+
+  - Update version number in manifest.json
+  - Update version display in popup.html
+  - Fix modal closing issue with backspace key
+
+
 - 0.1.0
   - Initial release
   - Visual kanban board for bookmarks
