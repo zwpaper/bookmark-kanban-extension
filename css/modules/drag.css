@@ -1,0 +1,134 @@
+/* 拖动手柄样式 - 缩小尺寸 */
+.column-drag-handle,
+.bookmark-drag-handle {
+  cursor: grab !important;
+  color: #64748b;
+  padding: 4px; /* 减小内边距 */
+  margin-right: 6px; /* 减小右边距 */
+  opacity: 0.6; /* 降低不透明度 */
+  transition: all 0.2s ease;
+  touch-action: none;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px; /* 减小字体大小 */
+  user-select: none;
+  width: 16px; /* 减小宽度 */
+  height: 16px; /* 减小高度 */
+  min-width: 16px;
+  min-height: 16px;
+  border-radius: 3px;
+}
+
+.column-drag-handle:hover,
+.bookmark-drag-handle:hover {
+  opacity: 0.9; /* 降低悬停时的不透明度 */
+  color: #2563eb;
+  transform: scale(1.05); /* 减小悬停时的放大效果 */
+  background-color: rgba(226, 232, 240, 0.5);
+}
+
+/* 确保拖动手柄总是可见 */
+.column-drag-handle::before,
+.bookmark-drag-handle::before {
+  content: "⠿";
+  display: inline-block;
+  font-size: 14px; /* 减小字体大小 */
+  line-height: 1;
+}
+
+/* 拖动时的全局状态 */
+body.dragging {
+  cursor: grabbing !important;
+}
+
+body.dragging .column-drag-handle,
+body.dragging .bookmark-drag-handle {
+  cursor: grabbing !important;
+}
+
+/* 列拖动状态 */
+.column-chosen {
+  background-color: #f1f5f9 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10;
+}
+
+.column-ghost {
+  opacity: 0.5;
+  background: #f0f0f0;
+}
+
+.column-drag {
+  opacity: 0.8;
+  background-color: #f8fafc !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  transform: rotate(0.5deg); /* 减小旋转角度 */
+}
+
+/* 书签拖动状态 */
+.bookmark-chosen {
+  background-color: #f1f5f9 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10;
+}
+
+.bookmark-ghost {
+  opacity: 0.5;
+  background: #f0f0f0;
+}
+
+.bookmark-drag {
+  opacity: 0.8;
+  background-color: #ffffff !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  transform: rotate(0.5deg); /* 减小旋转角度 */
+}
+
+/* 正在被拖动的元素 */
+.being-dragged {
+  opacity: 0.9 !important;
+  transform: scale(1.01) !important; /* 减小缩放比例 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  z-index: 1000 !important;
+  pointer-events: none;
+}
+
+/* 可放置区域高亮 */
+.sortable-ghost {
+  background-color: #f1f5f9 !important;
+  border: 2px dashed #3b82f6 !important;
+  opacity: 0.7 !important;
+}
+
+/* 禁用文本选择 */
+.dragging * {
+  user-select: none !important;
+}
+
+/* 添加动画效果 */
+.kanban-column, .bookmark-item {
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+/* 拖拽提示效果 - 预示可拖拽 */
+.kanban-column:hover .column-drag-handle,
+.bookmark-item:hover .bookmark-drag-handle {
+  background-color: rgba(226, 232, 240, 0.4);
+  border-radius: 3px;
+}
+
+/* 响应式调整 */
+@media (max-width: 640px) {
+  .column-drag-handle,
+  .bookmark-drag-handle {
+    padding: 6px;
+    font-size: 16px;
+  }
+}
+
+/* 确保列标题可以作为拖拽手柄 */
+.column-header {
+  cursor: move;
+  user-select: none;
+}

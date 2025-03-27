@@ -1,0 +1,491 @@
+/* css/newtab.css - Optimized Version */
+
+/* Variable Definitions */
+:root {
+  --primary-color: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --secondary-color: #64748b;
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-light: #64748b;
+  --bg-color: #f8fafc;
+  --bg-light: #f1f5f9;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --border-light: #cbd5e1;
+  --border-hover: #94a3b8;
+  --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --transition: all 0.3s ease;
+  --transition-fast: all 0.2s ease;
+}
+
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Header Styles */
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.header-controls {
+  text-align: right;
+}
+
+#current-time {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#current-date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Main Container */
+main {
+  max-width: 100%;
+  margin: 1.5rem auto;
+  padding: 0 1.5rem;
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--secondary-color);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: var(--primary-color);
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Kanban Layout */
+.kanban-board {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1rem 0 2rem;
+  min-height: calc(100vh - 180px);
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* Optimized Scrollbar Styles */
+.kanban-board::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-board::-webkit-scrollbar-track {
+  background: var(--bg-light);
+  border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+
+.kanban-board::-webkit-scrollbar-thumb:hover {
+  background: var(--border-hover);
+}
+
+/* Kanban Columns */
+.kanban-column {
+  flex: 0 0 350px;
+  max-width: 350px;
+  background: var(--bg-light);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 180px);
+}
+
+.column-header {
+  padding: 1rem;
+  background: var(--border-color);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-header:hover {
+  cursor: default; 
+}
+
+.bookmark-count {
+  background: var(--bg-color);
+  color: var(--secondary-color);
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+}
+
+.bookmark-list {
+  padding: 0.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* Bookmark Items */
+.bookmark-item {
+  position: relative;
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 0.8rem;
+  margin-bottom: 0.7rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bookmark-item:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--primary-light);
+}
+
+.bookmark-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.bookmark-icon:hover {
+  cursor: move; /* Show cross arrow */
+}
+
+.bookmark-title {
+  flex-grow: 1;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 28px;
+  max-width: 280px;
+}
+
+.bookmark-title:hover {
+  cursor: pointer; /* Show hand pointer */
+}
+
+/* Bookmark Action Buttons */
+.bookmark-actions {
+  display: none;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: column;
+  gap: 2px;
+  height: calc(100% - 10px);
+  justify-content: center;
+}
+
+.bookmark-item:hover .bookmark-actions {
+  display: flex;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-light);
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.edit-btn {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: 2; /* Edit button at bottom */
+}
+
+.edit-btn::before {
+  content: none;
+}
+
+.edit-btn:hover {
+  color: var(--primary-color);
+}
+
+.edit-btn span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn {
+  order: 1; /* Delete button at top */
+}
+
+.delete-btn:hover {
+  color: var(--danger-color);
+}
+
+.empty-column {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--secondary-color);
+  font-style: italic;
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 24px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 400px;
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: white;
+  transition: var(--transition-fast);
+}
+
+.form-group input:hover {
+  border-color: var(--border-hover);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input:disabled {
+  background-color: var(--bg-light);
+  border-color: var(--border-color);
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Button Styles */
+.btn-cancel, .btn-save, .btn-delete {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.btn-cancel {
+  background-color: var(--bg-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.btn-cancel:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-save {
+  background-color: var(--primary-color);
+  border: none;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-save:disabled, .btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-delete {
+  background-color: var(--danger-color);
+  border: none;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: var(--danger-dark);
+}
+
+/* 确认模态框特定样式 */
+.confirm-content {
+  max-width: 360px;
+}
+
+.confirm-message {
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.confirm-message span {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* 响应式设计 */
+@media (min-width: 1601px) {
+  .kanban-board {
+    justify-content: center; /* 在特宽屏上居中显示 */
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-board {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .kanban-column {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1.5rem;
+    max-height: none;
+  }
+  
+  .bookmark-title {
+    max-width: 430px;
+  }
+}
+
+/* 网站不可用状态的样式 */
+.bookmark-item[data-site-status="unavailable"] {
+  position: relative;
+  opacity: 0.7;
+}
+
+.bookmark-item[data-site-status="unavailable"] .bookmark-title {
+  color: #999;
+  text-decoration: line-through;
+}
+
+.bookmark-item[data-site-status="unavailable"]::after {
+  content: "⚠️";
+  font-size: 10px;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  color: #cc3333;
+}
+
+/* 鼠标悬停显示提示信息 */
+.bookmark-item[data-site-status="unavailable"]:hover::before {
+  content: "此网站可能已失效";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}

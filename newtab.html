@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookmark Kanban</title>
+  <link rel="stylesheet" href="css/newtab.css">
+  <link rel="stylesheet" href="css/modules/common.css">
+  <link rel="stylesheet" href="css/modules/drag.css">
+  <link rel="stylesheet" href="css/modules/modal.css">
+  <script src="lib/Sortable.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Bookmark Kanban</h1>
+    <div class="header-controls">
+      <div id="current-time"></div>
+      <div id="current-date"></div>
+    </div>
+  </header>
+  
+  <main id="kanban-container">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Loading your bookmarks...</p>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Bookmark</h2>
+      <form id="editBookmarkForm">
+        <div class="form-group">
+          <label for="bookmarkTitle">Title</label>
+          <input type="text" id="bookmarkTitle" required>
+        </div>
+        <div class="form-group">
+          <label for="bookmarkUrl">URL</label>
+          <input type="url" id="bookmarkUrl" required>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content confirm-content">
+      <h2>Delete Bookmark</h2>
+      <p class="confirm-message">Are you sure you want to delete "<span id="bookmarkTitle"></span>"?</p>
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" id="cancelDelete">Cancel</button>
+        <button type="button" class="btn-delete" id="confirmDelete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/newtab.js"></script>
+</body>
+</html>

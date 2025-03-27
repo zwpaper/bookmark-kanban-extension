@@ -1,0 +1,112 @@
+/* css/popup.css */
+body {
+  width: 300px;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  background-color: #f8fafc;
+  color: #334155;
+}
+
+.popup-container {
+  padding: 16px;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 18px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  color: #2563eb;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #1d4ed8;
+}
+
+button.button-secondary {
+  background-color: #64748b;
+  color: white;
+}
+
+button.button-secondary:hover {
+  background-color: #475569;
+}
+
+footer {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Toast Notification Styles */
+.toast {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toast-info {
+  background-color: #3b82f6;
+}
+
+.toast-success {
+  background-color: #10b981;
+}
+
+.toast-error {
+  background-color: #ef4444;
+}
+
+.toast.fade-out {
+  animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
