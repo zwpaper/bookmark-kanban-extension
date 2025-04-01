@@ -64,7 +64,7 @@ header {
 
 /* Dark theme header title */
 [data-theme="dark"] .header-left h1 {
-  color: #ffffff;
+  color: #f1f5f9;
 }
 
 /* Green theme header title */
@@ -93,7 +93,7 @@ header {
 [data-theme="dark"] .header-left h1,
 [data-theme="dark"] #current-time,
 [data-theme="dark"] #current-date {
-  color: #ffffff;
+  color: #f1f5f9;
 }
 
 /* Green theme header elements */
@@ -292,13 +292,23 @@ main {
   cursor: move;
 }
 
+.column-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex-grow: 1;
+  margin: 0 0.5rem;
+}
+
 .bookmark-count {
   background: var(--bg-color, var(--bg-secondary));
   color: var(--secondary-color);
-  font-size: 0.8rem;
-  padding: 0.2rem 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.6rem;
   border-radius: 12px;
   transition: background-color 0.3s, color 0.3s;
+  min-width: 2rem;
+  text-align: center;
 }
 
 .bookmark-list {

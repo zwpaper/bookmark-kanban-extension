@@ -6,6 +6,7 @@ import { DragManager } from './modules/dragManager.js';
 import { faviconLoader } from './modules/faviconLoader.js';
 import { storageManager } from './modules/storageManager.js';
 import { themeManager } from './modules/themeManager.js';
+import { CommandPalette } from './modules/commandPalette.js';
 
 export class App {
   constructor() {
@@ -19,19 +20,41 @@ export class App {
 
   async initialize() {
     try {
-      // Initialize theme manager
+      // Initialize theme manager first
       this.themeManager = themeManager;
+      await this.themeManager.initializeTheme();
       
-      // Initialize various managers
+      // Initialize bookmark manager
       this.bookmarkManager = new BookmarkManager();
-      this.uiManager = new UIManager(this.bookmarkManager);
-      this.modalManager = new ModalManager(this.bookmarkManager, this.uiManager);
-      this.dragManager = new DragManager(this.bookmarkManager, this.uiManager);
-
-      // Set general change listener
-      this.bookmarkManager.setChangeListener(() => this.handleBookmarksChange());
       
-      // Set delete-specific listener
+      // Initialize UI manager with bookmark manager
+      this.uiManager = new UIManager(this.bookmarkManager);
+      
+      // Initialize modal manager with bookmark and UI managers
+      this.modalManager = new ModalManager(this.bookmarkManager, this.uiManager);
+      
+      // Initialize drag manager with bookmark and UI managers
+      this.dragManager = new DragManager(this.bookmarkManager, this.uiManager);
+      
+      // Initialize command palette after theme manager
+      this.commandPalette = new CommandPalette(this.bookmarkManager);
+      await this.commandPalette.initialize();
+      
+      // Set up message listeners for theme changes
+      this.setupMessageListeners();
+      
+      // Check if new tab feature is enabled
+      const enabled = await this.checkNewTabEnabled();
+      if (!enabled) {
+        this.showDisabledMessage();
+        return;
+      }
+
+      // Show loading status
+      this.uiManager.showLoading();
+      
+      // Set bookmark change listeners
+      this.bookmarkManager.setChangeListener(() => this.handleBookmarksChange());
       this.bookmarkManager.setRemoveListener((id) => {
         // Directly handle DOM, without triggering full refresh
         const bookmarkItem = document.querySelector(`[data-bookmark-id="${id}"]`);
@@ -45,19 +68,6 @@ export class App {
           }, 300);
         }
       });
-
-      // Listen for messages from the extension
-      this.setupMessageListeners();
-
-      // Check if new tab feature is enabled
-      const enabled = await this.checkNewTabEnabled();
-      if (!enabled) {
-        this.showDisabledMessage();
-        return;
-      }
-
-      // Show loading status
-      this.uiManager.showLoading();
       
       // Render board
       await this.uiManager.renderKanban();
