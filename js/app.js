@@ -5,6 +5,7 @@ import { ModalManager } from './modules/modalManager.js';
 import { DragManager } from './modules/dragManager.js';
 import { faviconLoader } from './modules/faviconLoader.js';
 import { storageManager } from './modules/storageManager.js';
+import { themeManager } from './modules/themeManager.js';
 
 export class App {
   constructor() {
@@ -18,6 +19,9 @@ export class App {
 
   async initialize() {
     try {
+      // Initialize theme manager
+      this.themeManager = themeManager;
+      
       // Initialize various managers
       this.bookmarkManager = new BookmarkManager();
       this.uiManager = new UIManager(this.bookmarkManager);
@@ -41,6 +45,9 @@ export class App {
           }, 300);
         }
       });
+
+      // Listen for messages from the extension
+      this.setupMessageListeners();
 
       // Check if new tab feature is enabled
       const enabled = await this.checkNewTabEnabled();
@@ -68,6 +75,21 @@ export class App {
       console.error('Failed to initialize app:', error);
       this.showErrorMessage();
     }
+  }
+
+  /**
+   * Set message listeners, especially for theme change messages
+   */
+  setupMessageListeners() {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.type === 'THEME_CHANGED') {
+        // Apply new theme
+        this.themeManager.applyTheme(message.theme);
+        sendResponse({ success: true });
+      }
+      // Return true to indicate asynchronous response
+      return true;
+    });
   }
 
   /**
@@ -308,5 +330,21 @@ export class App {
   resetLayout() {
     storageManager.clearAllOrderData();
     location.reload();
-  }  
+  }
+
+  /**
+   * Switch theme
+   * @param {string} theme Theme name
+   */
+  async switchTheme(theme) {
+    try {
+      await this.themeManager.switchTheme(theme);
+      this.showToast(`Theme switched to ${theme}`);
+      return true;
+    } catch (error) {
+      console.error('Failed to switch theme:', error);
+      this.showToast('Failed to switch theme', 'error');
+      return false;
+    }
+  }
 } 

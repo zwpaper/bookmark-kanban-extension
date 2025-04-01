@@ -17,6 +17,7 @@ A Chrome extension that displays your bookmarks in a visual kanban board layout,
 - 💾 Layout persistence (columns and bookmarks order is saved)
 - 🌐 Website availability checking with visual indicators
 - 🖼️ Favicon loading with smart caching
+- 🎨 Multiple theme options (Default, Dark, Green, Purple, High Contrast)
 
 ## Installation
 
@@ -34,6 +35,7 @@ The extension operates primarily by replacing your new tab page with a kanban bo
 3. Click on a bookmark to open it in a new tab
 4. Use the edit and delete buttons to manage your bookmarks
 5. Access settings through the extension popup by clicking the extension icon in your toolbar
+6. Use the theme selector in the header to switch between different visual themes
 
 ## Features in Detail
 
@@ -53,6 +55,18 @@ The extension operates primarily by replacing your new tab page with a kanban bo
 - Column order is automatically saved
 - Bookmark order within columns is preserved
 - Settings are synced through your Chrome account
+
+### Theme System
+- Multiple theme options available:
+  - Default: Clean and modern light theme
+  - Dark: Easy on the eyes dark theme
+  - Green: Nature-inspired green theme
+  - Purple: Elegant purple theme
+  - High Contrast: Accessibility-focused theme
+- Theme preference is automatically saved
+- System theme detection and auto-switching
+- Smooth transitions between themes
+- Consistent styling across all components
 
 ### User Interface
 - Clean and intuitive design
@@ -82,16 +96,18 @@ bookmark-kanban/
 │       ├── modalManager.js  # Modal dialogs
 │       ├── faviconLoader.js # Favicon loading and caching
 │       ├── siteChecker.js   # Website availability checking
+│       ├── themeManager.js  # Theme management
 │       └── utils.js         # Utility functions
 ├── css/
 │   ├── popup.css
 │   ├── newtab.css
-│   └── modules/             # CSS modules
+│   ├── themes.css          # Theme definitions
+│   └── modules/            # CSS modules
 │       ├── common.css
 │       ├── drag.css
 │       └── modal.css
 ├── lib/
-│   └── Sortable.min.js      # Third-party drag and drop library
+│   └── Sortable.min.js     # Third-party drag and drop library
 ├── icons/
 │   ├── icon16.png
 │   ├── icon48.png
@@ -148,13 +164,16 @@ Chen Yifeng
 
 ## Version History
 
+- 0.1.2
+  - Added theme selection feature with multiple theme options
+  - Added system theme detection and auto-switching
+  - Improved theme transition animations
+  - Added theme persistence
 
 - 0.1.1
-
   - Update version number in manifest.json
   - Update version display in popup.html
   - Fix modal closing issue with backspace key
-
 
 - 0.1.0
   - Initial release

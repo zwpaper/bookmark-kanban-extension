@@ -1,5 +1,6 @@
 // js/popup.js
 import { storageManager } from './modules/storageManager.js';
+import { themeManager } from './modules/themeManager.js';
 
 class PopupManager {
   constructor() {
@@ -19,6 +20,11 @@ class PopupManager {
       const checkbox = document.getElementById('show-on-newtab');
       checkbox.checked = result.showOnNewTab !== false;
     });
+    
+    const themeSelector = document.getElementById('theme-selector');
+    themeSelector.value = themeManager.getCurrentTheme();
+    
+    document.documentElement.setAttribute('data-theme', themeManager.getCurrentTheme());
   }
 
   /**
@@ -29,6 +35,12 @@ class PopupManager {
     const checkbox = document.getElementById('show-on-newtab');
     checkbox.addEventListener('change', (e) => {
       this.saveSettings(e.target.checked);
+    });
+
+    // Theme selector
+    const themeSelector = document.getElementById('theme-selector');
+    themeSelector.addEventListener('change', (e) => {
+      this.handleThemeChange(e.target.value);
     });
 
     // Refresh button
@@ -46,11 +58,39 @@ class PopupManager {
     }
 
     // Version info click
-    const versionInfo = document.querySelector('.version-info');
+    const versionInfo = document.querySelector('footer p');
     if (versionInfo) {
       versionInfo.addEventListener('click', () => {
         this.showAboutDialog();
       });
+    }
+  }
+
+  /**
+   * Handle theme change
+   * @param {string} theme Theme name
+   */
+  async handleThemeChange(theme) {
+    try {
+      document.documentElement.setAttribute('data-theme', theme === 'default' ? '' : theme);
+      
+      const success = await themeManager.switchTheme(theme);
+      
+      if (success) {
+        this.showToast('Theme updated');
+        
+        const tabs = await chrome.tabs.query({ url: 'chrome://newtab/*' });
+        tabs.forEach(tab => {
+          chrome.tabs.sendMessage(tab.id, { type: 'THEME_CHANGED', theme }).catch(() => {
+            // Ignore tabs that cannot communicate
+          });
+        });
+      } else {
+        this.showToast('Failed to update theme', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to change theme:', error);
+      this.showToast('Failed to update theme', 'error');
     }
   }
 

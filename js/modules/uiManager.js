@@ -1,12 +1,14 @@
 import { createElement, formatDateTime, getDomain } from './utils.js';
 import { faviconLoader } from './faviconLoader.js';
 import { storageManager } from './storageManager.js';
+import { themeManager } from './themeManager.js';
 
 export class UIManager {
   constructor(bookmarkManager) {
     this.bookmarkManager = bookmarkManager;
     this.container = document.getElementById('kanban-container');
     this.initializeTimeUpdate();
+    this.initializeThemeSelector();
   }
 
   /**
@@ -21,6 +23,78 @@ export class UIManager {
 
     updateDateTime();
     setInterval(updateDateTime, 1000);
+  }
+
+  /**
+   * 初始化主题选择器
+   */
+  initializeThemeSelector() {
+    const themeSelector = document.getElementById('theme-selector');
+    if (!themeSelector) return;
+    
+    // 设置当前主题
+    themeSelector.value = themeManager.getCurrentTheme();
+    
+    // 添加变更事件监听器
+    themeSelector.addEventListener('change', (e) => {
+      const newTheme = e.target.value;
+      this.handleThemeChange(newTheme);
+    });
+  }
+
+  /**
+   * 处理主题变更
+   * @param {string} theme 主题名称
+   */
+  async handleThemeChange(theme) {
+    try {
+      const success = await themeManager.switchTheme(theme);
+      if (success) {
+        this.showThemeToast('主题已更新', 'success');
+      } else {
+        this.showThemeToast('主题更新失败', 'error');
+      }
+    } catch (error) {
+      console.error('切换主题失败:', error);
+      this.showThemeToast('主题更新失败', 'error');
+    }
+  }
+
+  /**
+   * 显示主题切换提示
+   * @param {string} message 提示信息
+   * @param {string} type 提示类型
+   */
+  showThemeToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '10px 15px';
+    toast.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+    toast.style.color = 'white';
+    toast.style.borderRadius = '4px';
+    toast.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+    toast.style.zIndex = '9999';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '1';
+    }, 10);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
   }
 
   /**

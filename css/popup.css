@@ -1,11 +1,23 @@
 /* css/popup.css */
+:root {
+  /* Use the same variables as the theme system */
+  --primary-color: #2563eb;
+  --primary-light: #3b82f6;
+  --primary-dark: #1d4ed8;
+  --secondary-color: #64748b;
+  --text-primary: #334155;
+  --bg-primary: #f8fafc;
+  --border-color: #e2e8f0;
+}
+
 body {
   width: 300px;
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  background-color: #f8fafc;
-  color: #334155;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .popup-container {
@@ -15,10 +27,10 @@ body {
 h2 {
   margin-top: 0;
   font-size: 18px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 8px;
   margin-bottom: 16px;
-  color: #2563eb;
+  color: var(--primary-color);
 }
 
 .form-group {
@@ -29,14 +41,38 @@ label {
   display: flex;
   align-items: center;
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 input[type="checkbox"] {
   margin-right: 8px;
+  cursor: pointer;
+}
+
+.theme-selector {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.theme-selector:hover {
+  border-color: var(--primary-light);
+}
+
+.theme-selector:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
 button {
-  background-color: #2563eb;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -48,11 +84,11 @@ button {
 }
 
 button:hover {
-  background-color: #1d4ed8;
+  background-color: var(--primary-dark);
 }
 
 button.button-secondary {
-  background-color: #64748b;
+  background-color: var(--secondary-color);
   color: white;
 }
 
@@ -63,8 +99,13 @@ button.button-secondary:hover {
 footer {
   margin-top: 24px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--secondary-color);
   text-align: center;
+  cursor: pointer;
+}
+
+footer:hover {
+  color: var(--primary-color);
 }
 
 /* Toast Notification Styles */
@@ -86,7 +127,7 @@ footer {
 }
 
 .toast-info {
-  background-color: #3b82f6;
+  background-color: var(--primary-color);
 }
 
 .toast-success {

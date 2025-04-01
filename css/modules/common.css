@@ -1,49 +1,4 @@
-:root {
-  /* 颜色 */
-  --primary-color: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
-  --secondary-color: #64748b;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
-  
-  /* 文字颜色 */
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-light: #94a3b8;
-  
-  /* 背景颜色 */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-light: #f1f5f9;
-  
-  /* 边框 */
-  --border-color: #e2e8f0;
-  --border-radius-sm: 4px;
-  --border-radius: 8px;
-  --border-radius-lg: 12px;
-  
-  /* 阴影 */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  
-  /* 间距 */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  
-  /* 动画 */
-  --transition-fast: 0.2s ease;
-  --transition: 0.3s ease;
-  --transition-slow: 0.5s ease;
-}
-
-/* 重置样式 */
+/* Reset styles */
 * {
   margin: 0;
   padding: 0;
@@ -52,14 +7,14 @@
 
 body {
   font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* 通用工具类 */
+/* Common utility classes */
 .hidden {
   display: none !important;
 }
@@ -81,7 +36,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 动画类 */
+/* Animation classes */
 .fade-in {
   animation: fadeIn var(--transition) forwards;
 }
@@ -100,84 +55,83 @@ body {
   to { opacity: 0; }
 }
 
-/* 响应式断点 */
+/* Responsive breakpoints */
 @media (max-width: 640px) {
-  :root {
-    --spacing-lg: 16px;
-    --spacing-xl: 24px;
-  }
+  /* Remove :root variable definitions, use definitions from themes.css */
 }
 
 .bookmark-item {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    margin: 4px 0;
-    background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm);
+  margin: var(--spacing-xs) 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .bookmark-item:hover {
-    background: #f5f5f5;
+  background: var(--bg-light);
+  border-color: var(--border-hover);
 }
 
 .bookmark-icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-right: var(--spacing-sm);
+  flex-shrink: 0;
 }
 
 .bookmark-title {
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .bookmark-actions {
-    display: flex;
-    gap: 4px;
-    opacity: 0;
-    transition: opacity 0.2s;
+  display: flex;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  transition: var(--transition);
 }
 
 .bookmark-item:hover .bookmark-actions {
-    opacity: 1;
+  opacity: 1;
 }
 
 .action-btn {
-    padding: 2px 6px;
-    background: none;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #666;
-    transition: all 0.2s;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-light);
+  transition: var(--transition);
 }
 
 .action-btn:hover {
-    background: #e0e0e0;
-    color: #333;
+  background: var(--bg-light);
+  color: var(--text-primary);
 }
 
 .edit-btn {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .delete-btn {
-    font-size: 16px;
+  font-size: 16px;
 }
 
-/* 拖拽手柄样式 */
+/* Drag handle styles */
 .bookmark-item {
-    cursor: move; /* 指示可拖动 */
+  cursor: move; /* Indicates draggable */
 }
 
 .bookmark-actions {
-    cursor: default; /* 按钮区域保持默认指针 */
+  cursor: default; /* Keep default pointer in button area */
 }
