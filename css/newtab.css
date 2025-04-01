@@ -120,12 +120,14 @@ header {
 .header-left {
   display: flex;
   align-items: center;
+  gap: 1rem;
 }
 
 .header-controls {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  margin-left: auto;
 }
 
 /* 主题选择器样式 */
@@ -177,6 +179,159 @@ header {
   color: var(--text-primary);
 }
 
+/* Display Mode Selector Styles */
+.display-mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.display-mode-icon {
+  font-size: 1.2rem;
+}
+
+.display-mode-selector {
+  background-color: var(--primary-light);
+  color: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 1.5rem;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.3rem center;
+  background-size: 1.2rem;
+}
+
+.display-mode-selector:hover {
+  background-color: var(--primary-dark);
+}
+
+/* High contrast theme specific hover effect */
+[data-theme="high-contrast"] .display-mode-selector:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+}
+
+.display-mode-selector option {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+}
+
+/* Single Line Mode Styles */
+body[data-display-mode="single"] .bookmark-item {
+  padding: 0.5rem 0.8rem;
+  height: 36px;
+}
+
+body[data-display-mode="single"] .bookmark-content {
+  display: flex;
+  align-items: center;
+  width: calc(100%);
+}
+
+body[data-display-mode="single"] .bookmark-domain {
+  display: none;
+}
+
+body[data-display-mode="single"] .bookmark-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100%);
+}
+
+body[data-display-mode="single"] .bookmark-actions {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  gap: 4px;
+  height: auto;
+}
+
+/* Tooltip for showing URL on hover in single-line mode */
+body[data-display-mode="single"] .bookmark-item {
+  position: relative;
+  z-index: 1;
+  transition: z-index 0s linear 0.1s;
+}
+
+body[data-display-mode="single"] .bookmark-item:hover {
+  z-index: 10;
+  transition: z-index 0s;
+}
+
+body[data-display-mode="single"] .bookmark-item::after {
+  content: none;
+  pointer-events: none;
+}
+
+body[data-display-mode="single"] .bookmark-item:hover::after {
+  content: attr(data-url);
+  position: absolute;
+  left: 50%;
+  bottom: -28px;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+body[data-display-mode="single"] .bookmark-list {
+  padding-bottom: 30px;
+}
+
+body[data-display-mode="single"] .bookmark-item:nth-last-child(-n+3):hover::after {
+  bottom: auto;
+  top: -28px;
+}
+
+/* 确保 tooltip 显示在书签列表的最上层 */
+.bookmark-list {
+  position: relative;
+  z-index: 1;
+}
+
+body[data-display-mode="single"] .bookmark-item:hover::after {
+  z-index: 999999;
+}
+
+/* Double Line Mode - Default styling, keeping for clarity */
+body[data-display-mode="double"] .bookmark-item {
+  padding: 0.8rem;
+}
+
+body[data-display-mode="double"] .bookmark-domain {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
 /* Theme selector styles for each theme */
 [data-theme="default"] .theme-selector,
 [data-theme="dark"] .theme-selector,
@@ -189,11 +344,16 @@ header {
 #current-time {
   font-size: 1.5rem;
   font-weight: bold;
+  min-width: 120px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 #current-date {
   font-size: 0.9rem;
   opacity: 0.9;
+  min-width: 100px;
+  text-align: center;
 }
 
 /* Main Container */
@@ -352,7 +512,7 @@ main {
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 28px;
-  max-width: 280px;
+  max-width: 320px;
   color: var(--text-primary);
   transition: color 0.3s;
 }
