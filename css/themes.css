@@ -44,19 +44,19 @@
 /* Dark theme */
 [data-theme="dark"] {
   /* Primary color */
-  --primary-color: #3b82f6;
-  --primary-light: #60a5fa;
-  --primary-dark: #2563eb;
-  --secondary-color: #94a3b8;
-  --danger-color: #ef4444;
-  --danger-dark: #dc2626;
-  --warning-color: #f59e0b;
-  --success-color: #10b981;
+  --primary-color: #4f46e5;
+  --primary-light: #6366f1;
+  --primary-dark: #3730a3;
+  --secondary-color: #64748b;
+  --danger-color: #dc2626;
+  --danger-dark: #b91c1c;
+  --warning-color: #d97706;
+  --success-color: #059669;
 
   /* Text color */
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-light: #94a3b8;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-light: #64748b;
 
   /* Background color */
   --bg-color: #0f172a;
@@ -132,10 +132,10 @@
 
 /* High contrast theme */
 [data-theme="high-contrast"] {
-  /* Primary color */
-  --primary-color: #0000ff;
-  --primary-light: #0000ff;
-  --primary-dark: #0000ff;
+  /* Primary color - used for header background */
+  --primary-color: #000000;
+  --primary-light: #000000;
+  --primary-dark: #000000;
   --secondary-color: #000000;
   --danger-color: #ff0000;
   --danger-dark: #ff0000;

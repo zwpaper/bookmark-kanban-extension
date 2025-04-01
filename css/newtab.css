@@ -55,14 +55,71 @@ header {
   transition: var(--transition);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
+/* Default theme header title */
 .header-left h1 {
   margin: 0;
   font-size: 1.5rem;
+  color: #ffffff;
+}
+
+/* Dark theme header title */
+[data-theme="dark"] .header-left h1 {
+  color: #ffffff;
+}
+
+/* Green theme header title */
+[data-theme="green"] .header-left h1 {
+  color: #ffffff;
+}
+
+/* Purple theme header title */
+[data-theme="purple"] .header-left h1 {
+  color: #ffffff;
+}
+
+/* High contrast theme header title */
+[data-theme="high-contrast"] .header-left h1 {
+  color: #ffffff;
+}
+
+/* Default theme header elements */
+.header-left h1,
+#current-time,
+#current-date {
+  color: #ffffff;
+}
+
+/* Dark theme header elements */
+[data-theme="dark"] .header-left h1,
+[data-theme="dark"] #current-time,
+[data-theme="dark"] #current-date {
+  color: #ffffff;
+}
+
+/* Green theme header elements */
+[data-theme="green"] .header-left h1,
+[data-theme="green"] #current-time,
+[data-theme="green"] #current-date {
+  color: #ffffff;
+}
+
+/* Purple theme header elements */
+[data-theme="purple"] .header-left h1,
+[data-theme="purple"] #current-time,
+[data-theme="purple"] #current-date {
+  color: #ffffff;
+}
+
+/* High contrast theme header elements */
+[data-theme="high-contrast"] .header-left h1,
+[data-theme="high-contrast"] #current-time,
+[data-theme="high-contrast"] #current-date {
+  color: #ffffff;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
 }
 
 .header-controls {
@@ -85,7 +142,7 @@ header {
 
 .theme-selector {
   background-color: var(--primary-light);
-  color: var(--card-bg);
+  color: #ffffff;
   border: 1px solid var(--border-light);
   border-radius: var(--border-radius);
   padding: 0.3rem 0.6rem;
@@ -107,9 +164,26 @@ header {
   background-color: var(--primary-dark);
 }
 
+/* High contrast theme specific hover effect */
+[data-theme="high-contrast"] .theme-selector:hover {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+}
+
 .theme-selector option {
   background-color: var(--card-bg);
   color: var(--text-primary);
+}
+
+/* Theme selector styles for each theme */
+[data-theme="default"] .theme-selector,
+[data-theme="dark"] .theme-selector,
+[data-theme="green"] .theme-selector,
+[data-theme="purple"] .theme-selector,
+[data-theme="high-contrast"] .theme-selector {
+  color: #ffffff;
 }
 
 #current-time {
@@ -565,11 +639,21 @@ main {
 }
 
 /* 高对比度模式下的一些特殊调整 */
-[data-theme="high-contrast"] .bookmark-item {
+[data-theme="high-contrast"] .kanban-column {
   border-width: 2px;
+  border-color: var(--border-color);
+}
+
+[data-theme="high-contrast"] .bookmark-item {
+  border-width: 1px;
   border-color: var(--border-color);
 }
 
 [data-theme="high-contrast"] .bookmark-item:hover {
   transform: translateY(-3px);
+  border-color: var(--border-hover);
+}
+
+[data-theme="high-contrast"] .column-header {
+  border-bottom-width: 2px;
 }
