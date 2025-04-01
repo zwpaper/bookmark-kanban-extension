@@ -474,6 +474,9 @@ export class UIManager {
     item.setAttribute('data-bookmark-id', bookmark.id);
     item.setAttribute('draggable', 'true');
     
+    // Add URL as data attribute for single-line mode tooltip
+    item.setAttribute('data-url', bookmark.url);
+    
     const content = createElement('div', 'bookmark-content');
     
     // Create favicon container

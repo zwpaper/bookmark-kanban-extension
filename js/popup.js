@@ -25,45 +25,21 @@ class PopupManager {
     themeSelector.value = themeManager.getCurrentTheme();
     
     document.documentElement.setAttribute('data-theme', themeManager.getCurrentTheme());
+
+    // Load display mode settings
+    this.loadDisplayModeSettings();
   }
 
   /**
-   * Setup event listeners
+   * Load display mode settings
    */
-  setupEventListeners() {
-    // New tab display settings
-    const checkbox = document.getElementById('show-on-newtab');
-    checkbox.addEventListener('change', (e) => {
-      this.saveSettings(e.target.checked);
+  loadDisplayModeSettings() {
+    chrome.storage.sync.get(['bookmark_board_display_mode'], result => {
+      const displayModeSelector = document.getElementById('display-mode-selector');
+      if (displayModeSelector) {
+        displayModeSelector.value = result.bookmark_board_display_mode || 'double';
+      }
     });
-
-    // Theme selector
-    const themeSelector = document.getElementById('theme-selector');
-    themeSelector.addEventListener('change', (e) => {
-      this.handleThemeChange(e.target.value);
-    });
-
-    // Refresh button
-    const refreshButton = document.getElementById('refresh-bookmarks');
-    refreshButton.addEventListener('click', () => {
-      this.handleRefresh();
-    });
-
-    // Reset layout button
-    const resetButton = document.getElementById('reset-layout');
-    if (resetButton) {
-      resetButton.addEventListener('click', () => {
-        this.handleResetLayout();
-      });
-    }
-
-    // Version info click
-    const versionInfo = document.querySelector('footer p');
-    if (versionInfo) {
-      versionInfo.addEventListener('click', () => {
-        this.showAboutDialog();
-      });
-    }
   }
 
   /**
@@ -91,6 +67,28 @@ class PopupManager {
     } catch (error) {
       console.error('Failed to change theme:', error);
       this.showToast('Failed to update theme', 'error');
+    }
+  }
+
+  /**
+   * Handle display mode change
+   * @param {string} mode Display mode name
+   */
+  async handleDisplayModeChange(mode) {
+    try {
+      await chrome.storage.sync.set({ 'bookmark_board_display_mode': mode });
+      
+      this.showToast('Display mode updated');
+      
+      const tabs = await chrome.tabs.query({ url: 'chrome://newtab/*' });
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, { type: 'DISPLAY_MODE_CHANGED', mode }).catch(() => {
+          // Ignore tabs that cannot communicate
+        });
+      });
+    } catch (error) {
+      console.error('Failed to change display mode:', error);
+      this.showToast('Failed to update display mode', 'error');
     }
   }
 

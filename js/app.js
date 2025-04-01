@@ -6,6 +6,7 @@ import { DragManager } from './modules/dragManager.js';
 import { faviconLoader } from './modules/faviconLoader.js';
 import { storageManager } from './modules/storageManager.js';
 import { themeManager } from './modules/themeManager.js';
+import { displayManager } from './modules/displayManager.js';
 import { CommandPalette } from './modules/commandPalette.js';
 
 export class App {
@@ -24,6 +25,10 @@ export class App {
       this.themeManager = themeManager;
       await this.themeManager.initializeTheme();
       
+      // Initialize display manager
+      this.displayManager = displayManager;
+      await this.displayManager.initializeDisplayMode();
+      
       // Initialize bookmark manager
       this.bookmarkManager = new BookmarkManager();
       
@@ -40,7 +45,7 @@ export class App {
       this.commandPalette = new CommandPalette(this.bookmarkManager);
       await this.commandPalette.initialize();
       
-      // Set up message listeners for theme changes
+      // Set up message listeners for theme and display mode changes
       this.setupMessageListeners();
       
       // Check if new tab feature is enabled
@@ -88,13 +93,18 @@ export class App {
   }
 
   /**
-   * Set message listeners, especially for theme change messages
+   * Set message listeners, especially for theme and display mode change messages
    */
   setupMessageListeners() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (message.type === 'THEME_CHANGED') {
         // Apply new theme
         this.themeManager.applyTheme(message.theme);
+        sendResponse({ success: true });
+      }
+      else if (message.type === 'DISPLAY_MODE_CHANGED') {
+        // Apply new display mode
+        this.displayManager.applyDisplayMode(message.mode);
         sendResponse({ success: true });
       }
       // Return true to indicate asynchronous response
@@ -354,6 +364,22 @@ export class App {
     } catch (error) {
       console.error('Failed to switch theme:', error);
       this.showToast('Failed to switch theme', 'error');
+      return false;
+    }
+  }
+
+  /**
+   * Switch display mode
+   * @param {string} mode Display mode name
+   */
+  async switchDisplayMode(mode) {
+    try {
+      await this.displayManager.switchDisplayMode(mode);
+      this.showToast(`Display mode switched to ${mode} line`);
+      return true;
+    } catch (error) {
+      console.error('Failed to switch display mode:', error);
+      this.showToast('Failed to switch display mode', 'error');
       return false;
     }
   }
