@@ -192,61 +192,177 @@
 /* 书签高亮效果 */
 .bookmark-item.highlight {
   animation: highlight-pulse 2s ease-in-out;
+  z-index: 10 !important;
+  position: relative !important;
 }
 
+/* 默认主题的增强定位动画 */
 @keyframes highlight-pulse {
   0% {
-    background-color: rgba(74, 144, 226, 0);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.5);
+    background-color: rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
+    transform: scale(1);
   }
-  20% {
-    background-color: rgba(74, 144, 226, 0.1);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 1);
+  25% {
+    background-color: rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.8);
+    transform: scale(1.03);
+  }
+  50% {
+    background-color: rgba(37, 99, 235, 0.1);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.6);
+    transform: scale(1.01);
+  }
+  75% {
+    background-color: rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.8);
+    transform: scale(1.03);
   }
   100% {
-    background-color: rgba(74, 144, 226, 0);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0);
+    background-color: rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 0px rgba(37, 99, 235, 0);
+    transform: scale(1);
   }
 }
 
+/* 深色主题的增强定位动画 */
 [data-theme="dark"] .bookmark-item.highlight {
   animation: highlight-pulse-dark 2s ease-in-out;
 }
 
 @keyframes highlight-pulse-dark {
   0% {
-    background-color: rgba(92, 156, 245, 0);
-    box-shadow: 0 0 0 2px rgba(92, 156, 245, 0.5);
+    background-color: rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    transform: scale(1);
   }
-  20% {
-    background-color: rgba(92, 156, 245, 0.15);
-    box-shadow: 0 0 0 2px rgba(92, 156, 245, 1);
+  25% {
+    background-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.8);
+    transform: scale(1.03);
+  }
+  50% {
+    background-color: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6);
+    transform: scale(1.01);
+  }
+  75% {
+    background-color: rgba(59, 130, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.8);
+    transform: scale(1.03);
   }
   100% {
-    background-color: rgba(92, 156, 245, 0);
-    box-shadow: 0 0 0 2px rgba(92, 156, 245, 0);
+    background-color: rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0px rgba(59, 130, 246, 0);
+    transform: scale(1);
   }
 }
 
-/* 高对比度主题高亮效果 */
+/* 绿色主题的增强定位动画 */
+[data-theme="green"] .bookmark-item.highlight {
+  animation: highlight-pulse-green 2s ease-in-out;
+}
+
+@keyframes highlight-pulse-green {
+  0% {
+    background-color: rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.5);
+    transform: scale(1);
+  }
+  25% {
+    background-color: rgba(16, 185, 129, 0.25);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.8);
+    transform: scale(1.03);
+  }
+  50% {
+    background-color: rgba(16, 185, 129, 0.15);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.6);
+    transform: scale(1.01);
+  }
+  75% {
+    background-color: rgba(16, 185, 129, 0.25);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.8);
+    transform: scale(1.03);
+  }
+  100% {
+    background-color: rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 0px rgba(16, 185, 129, 0);
+    transform: scale(1);
+  }
+}
+
+/* 紫色主题的增强定位动画 */
+[data-theme="purple"] .bookmark-item.highlight {
+  animation: highlight-pulse-purple 2s ease-in-out;
+}
+
+@keyframes highlight-pulse-purple {
+  0% {
+    background-color: rgba(139, 92, 246, 0);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+    transform: scale(1);
+  }
+  25% {
+    background-color: rgba(139, 92, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.8);
+    transform: scale(1.03);
+  }
+  50% {
+    background-color: rgba(139, 92, 246, 0.15);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.6);
+    transform: scale(1.01);
+  }
+  75% {
+    background-color: rgba(139, 92, 246, 0.25);
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.8);
+    transform: scale(1.03);
+  }
+  100% {
+    background-color: rgba(139, 92, 246, 0);
+    box-shadow: 0 0 0 0px rgba(139, 92, 246, 0);
+    transform: scale(1);
+  }
+}
+
+/* 高对比度主题的强烈定位动画 */
 [data-theme="high-contrast"] .bookmark-item.highlight {
-  animation: highlight-pulse-high-contrast 2s ease-in-out !important;
+  animation: highlight-pulse-high-contrast 2s ease-in-out;
 }
 
 @keyframes highlight-pulse-high-contrast {
   0% {
-    background-color: rgba(255, 255, 255, 0);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
-    transform: scale(1);
-  }
-  20% {
-    background-color: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 1);
+    background-color: #000000;
+    color: #ffffff;
+    box-shadow: 0 0 0 3px #000000;
     transform: scale(1.02);
   }
+  25% {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 0 3px #000000;
+    transform: scale(1.05);
+  }
+  50% {
+    background-color: #000000;
+    color: #ffffff;
+    box-shadow: 0 0 0 3px #000000;
+    transform: scale(1.02);
+  }
+  75% {
+    background-color: #ffffff;
+    color: #000000;
+    box-shadow: 0 0 0 3px #000000;
+    transform: scale(1.05);
+  }
   100% {
-    background-color: rgba(255, 255, 255, 0);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0);
+    background-color: transparent;
+    color: inherit;
+    box-shadow: 0 0 0 0 transparent;
     transform: scale(1);
   }
+}
+
+/* 确保高对比度主题中文本在动画期间可读 */
+[data-theme="high-contrast"] .bookmark-item.highlight .bookmark-title {
+  color: inherit !important;
 }

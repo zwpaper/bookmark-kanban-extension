@@ -6,18 +6,22 @@ A Chrome extension that displays your bookmarks in a visual kanban board layout,
 
 ## Features
 
-- 📋 Visual kanban board layout for bookmarks
-- 🎯 Drag and drop functionality for easy organization
-- 📱 Responsive design that works on all screen sizes
-- 🔄 Real-time bookmark updates
-- 🎨 Clean and modern interface
-- 🔍 Quick access to your bookmarks
-- 📊 Visual organization of bookmarks by category
-- 🕒 Date and time display on the new tab page
-- 💾 Layout persistence (columns and bookmarks order is saved)
-- 🌐 Website availability checking with visual indicators
-- 🖼️ Favicon loading with smart caching
-- 🎨 Multiple theme options (Default, Dark, Green, Purple, High Contrast)
+📋 Visual kanban board layout for bookmarks
+🎯 Drag and drop functionality for easy organization
+📱 Responsive design that works on all screen sizes
+🔄 Real-time bookmark updates
+🎨 Clean and modern interface
+🔍 Quick access to your bookmarks
+📊 Visual organization of bookmarks by category
+🕒 Date and time display on the new tab page
+💾 Layout persistence (columns and bookmarks order is saved)
+🎨 Multiple theme options (Default, Dark, Green, Purple, High Contrast)
+🔍 VS Code style command palette for quick bookmark search and navigation
+🎯 Enhanced visual feedback for search results across all themes
+♿ Improved accessibility with high contrast animations
+📝 Flexible display modes (single-line and double-line layouts)
+🎨 Simplified interface with clean typography
+
 
 ## Installation
 
@@ -48,8 +52,6 @@ The extension operates primarily by replacing your new tab page with a kanban bo
 ### Bookmark Management
 - Edit bookmark titles and URLs through a modal dialog
 - Delete bookmarks with confirmation
-- Visual indicators for unavailable websites
-- Automatic favicon loading for all bookmarks
 
 ### Layout Persistence
 - Column order is automatically saved
@@ -94,9 +96,9 @@ bookmark-kanban/
 │       ├── dragManager.js   # Drag and drop functionality
 │       ├── storageManager.js # Layout persistence
 │       ├── modalManager.js  # Modal dialogs
-│       ├── faviconLoader.js # Favicon loading and caching
 │       ├── siteChecker.js   # Website availability checking
 │       ├── themeManager.js  # Theme management
+│       ├── commandPalette.js # Command palette functionality
 │       └── utils.js         # Utility functions
 ├── css/
 │   ├── popup.css
@@ -105,7 +107,8 @@ bookmark-kanban/
 │   └── modules/            # CSS modules
 │       ├── common.css
 │       ├── drag.css
-│       └── modal.css
+│       ├── modal.css
+│       └── commandPalette.css
 ├── lib/
 │   └── Sortable.min.js     # Third-party drag and drop library
 ├── icons/
@@ -163,6 +166,16 @@ If you encounter any issues or have suggestions, please:
 Chen Yifeng
 
 ## Version History
+
+- 1.0.0
+  - Added VS Code style command palette for quick bookmark search
+  - Enhanced visual feedback for search results across all themes
+  - Improved accessibility with high contrast animations
+  - Added flexible display modes (single-line and double-line layouts)
+  - Simplified interface with clean typography
+  - Improved dark theme button styles
+  - Unified animation effects across all themes
+  - Enhanced overall user experience
 
 - 0.1.2
   - Added theme selection feature with multiple theme options
