@@ -620,7 +620,7 @@ main {
   box-shadow: 0 4px 6px rgba(239, 68, 68, 0.4);
 }
 
-/* 确认模态框特定样式 */
+/* Confirmation modal specific styles */
 .confirm-content {
   max-width: 360px;
 }
@@ -636,7 +636,7 @@ main {
   font-weight: 500;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (min-width: 1601px) {
   .kanban-board {
     justify-content: flex-start;
@@ -649,7 +649,7 @@ main {
 }
 
 @media (max-width: 768px) {
-  /* 看板布局调整 */
+  /* Kanban layout adjustments */
   .kanban-board {
     flex-direction: column;
     align-items: center;
@@ -672,7 +672,7 @@ main {
     max-width: 430px;
   }
   
-  /* 头部控制区域调整 */
+  /* Header control area adjustments */
   .header-controls {
     gap: 0.5rem;
   }
@@ -681,7 +681,7 @@ main {
     display: none;
   }
   
-  /* 主题和显示模式选择器调整 */
+  /* Theme and display mode selector adjustments */
   .theme-switch,
   .display-mode-switch {
     padding: 0.2rem 0.5rem;
@@ -702,7 +702,7 @@ main {
   }
 }
 
-/* 网站不可用状态的样式 */
+/* Website unavailable state styles */
 .bookmark-item[data-site-status="unavailable"] {
   position: relative;
   opacity: 0.7;
@@ -722,7 +722,7 @@ main {
   color: var(--warning-color, #cc3333);
 }
 
-/* 鼠标悬停显示提示信息 */
+/* Show tooltip on hover */
 .bookmark-item[data-site-status="unavailable"]:hover::before {
   content: "This website may be unavailable";
   position: absolute;
@@ -738,30 +738,16 @@ main {
   z-index: 100;
 }
 
-/* 深色模式下的特殊调整 */
+/* Special adjustments for dark mode */
 [data-theme="dark"] .spinner {
   border-color: var(--border-light);
   border-left-color: var(--primary-color);
 }
 
-/* 高对比度模式下的一些特殊调整 */
+/* Special adjustments for high contrast mode */
 [data-theme="high-contrast"] .kanban-column {
   border-width: 2px;
   border-color: var(--border-color);
-}
-
-[data-theme="high-contrast"] .bookmark-item {
-  border-width: 1px;
-  border-color: var(--border-color);
-}
-
-[data-theme="high-contrast"] .bookmark-item:hover {
-  transform: translateY(-3px);
-  border-color: var(--border-hover);
-}
-
-[data-theme="high-contrast"] .column-header {
-  border-bottom-width: 2px;
 }
 
 /* Enhanced Header Selectors */

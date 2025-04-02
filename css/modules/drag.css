@@ -3,18 +3,18 @@
 .bookmark-drag-handle {
   cursor: grab !important;
   color: #64748b;
-  padding: 4px; /* 减小内边距 */
-  margin-right: 6px; /* 减小右边距 */
-  opacity: 0.6; /* 降低不透明度 */
+  padding: 4px; /* Reduced padding */
+  margin-right: 6px; /* Reduced right margin */
+  opacity: 0.6; /* Lower opacity */
   transition: all 0.2s ease;
   touch-action: none;
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  font-size: 14px; /* 减小字体大小 */
+  font-size: 14px; /* Reduced font size */
   user-select: none;
-  width: 16px; /* 减小宽度 */
-  height: 16px; /* 减小高度 */
+  width: 16px; /* Reduced width */
+  height: 16px; /* Reduced height */
   min-width: 16px;
   min-height: 16px;
   border-radius: 3px;
@@ -22,22 +22,22 @@
 
 .column-drag-handle:hover,
 .bookmark-drag-handle:hover {
-  opacity: 0.9; /* 降低悬停时的不透明度 */
+  opacity: 0.9; /* Lower hover opacity */
   color: #2563eb;
-  transform: scale(1.05); /* 减小悬停时的放大效果 */
+  transform: scale(1.05); /* Reduced hover scale effect */
   background-color: rgba(226, 232, 240, 0.5);
 }
 
-/* 确保拖动手柄总是可见 */
+/* Ensure drag handle is always visible */
 .column-drag-handle::before,
 .bookmark-drag-handle::before {
   content: "⠿";
   display: inline-block;
-  font-size: 14px; /* 减小字体大小 */
+  font-size: 14px; /* Reduced font size */
   line-height: 1;
 }
 
-/* 拖动时的全局状态 */
+/* Global state during dragging */
 body.dragging {
   cursor: grabbing !important;
 }
@@ -63,7 +63,7 @@ body.dragging .bookmark-drag-handle {
   opacity: 0.8;
   background-color: #f8fafc !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  transform: rotate(0.5deg); /* 减小旋转角度 */
+  transform: rotate(0.5deg); /* Reduced rotation angle */
 }
 
 /* Bookmark drag states */
@@ -82,13 +82,13 @@ body.dragging .bookmark-drag-handle {
   opacity: 0.8;
   background-color: #ffffff !important;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-  transform: rotate(0.5deg); /* 减小旋转角度 */
+  transform: rotate(0.5deg); /* Reduced rotation angle */
 }
 
 /* Currently being dragged element */
 .being-dragged {
   opacity: 0.9 !important;
-  transform: scale(1.01) !important; /* 减小缩放比例 */
+  transform: scale(1.01) !important; /* Reduced scale */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
   z-index: 1000 !important;
   pointer-events: none;

@@ -32,10 +32,10 @@ export class UIManager {
     const themeSelector = document.getElementById('theme-selector');
     if (!themeSelector) return;
     
-    // 设置当前主题
+    // Set current theme
     themeSelector.value = themeManager.getCurrentTheme();
     
-    // 添加变更事件监听器
+    // Add change event listener
     themeSelector.addEventListener('change', (e) => {
       const newTheme = e.target.value;
       this.handleThemeChange(newTheme);

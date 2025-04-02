@@ -167,7 +167,7 @@ export class FaviconLoader {
       const domain = new URL(url).hostname;
       icon.src = `https://www.google.com/s2/favicons?domain=${domain}`;
       icon.onerror = () => {
-        // 加载失败时使用本地默认图标
+        // Use local default icon when loading fails
         icon.src = 'icons/default-favicon.png';
       };
     } catch (e) {

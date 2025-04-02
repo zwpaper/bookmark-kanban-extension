@@ -24,7 +24,7 @@ export class ModalManager {
     
     // Bind global click event for closing modals
     document.addEventListener('click', (e) => {
-      // 只有当点击模态框的背景区域时才关闭
+      // Only close when clicking the modal background
       if (e.target.classList.contains('modal') && !e.target.closest('.modal-content')) {
         this.closeActiveModal();
       }
@@ -66,11 +66,11 @@ export class ModalManager {
       </div>
     `;
 
-    // 添加键盘事件处理
+    // Add keyboard event handling
     const titleInput = modal.querySelector('#bookmarkTitle');
     const urlInput = modal.querySelector('#bookmarkUrl');
     
-    // 阻止输入框中的回退键触发历史导航
+    // Prevent backspace key from triggering history navigation in input fields
     [titleInput, urlInput].forEach(input => {
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace' && !e.target.value) {
@@ -141,69 +141,72 @@ export class ModalManager {
   showConfirmModal(bookmark) {
     const modal = this.confirmModal;
     
-    // 设置确认消息
+    // Set confirmation message
     const titleSpan = modal.querySelector('#deleteBookmarkTitle');
     titleSpan.textContent = bookmark.title;
     
-    // 获取按钮元素
+    // Get button elements
     const confirmBtn = modal.querySelector('.btn-delete');
     const cancelBtn = modal.querySelector('.btn-cancel');
     
-    // 移除现有的事件监听器
+    // Remove existing event listeners
     const newConfirmBtn = confirmBtn.cloneNode(true);
     const newCancelBtn = cancelBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
     cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
     
-    // 绑定新的删除事件
+    // Bind new delete event
     newConfirmBtn.addEventListener('click', async () => {
       try {
         newConfirmBtn.disabled = true;
         newConfirmBtn.textContent = 'Deleting...';
         
-        // 保存当前滚动位置
+        // Save current scroll position
         const scrollPosition = window.scrollY;
-        console.log("删除前滚动位置:", scrollPosition);
+        console.log("Delete before scroll position:", scrollPosition);
         
-        // 执行删除操作
+        // Execute delete operation
         await this.bookmarkManager.deleteBookmark(bookmark.id);
         
-        // 关闭模态框
+        // Close modal
         this.closeActiveModal();
         
-        // 显示成功消息
+        // Show success message
         this.showToast('Bookmark deleted');
         
-        // 重要：停止可能的全局刷新
-        // 使用直接DOM操作而不是触发完整的刷新
+        // Important: Stop possible global refresh
+        // Use direct DOM manipulation instead of triggering a full refresh
         const bookmarkItem = document.querySelector(`[data-bookmark-id="${bookmark.id}"]`);
         if (bookmarkItem) {
           bookmarkItem.style.transition = 'opacity 0.3s ease';
           bookmarkItem.style.opacity = '0';
           
           setTimeout(() => {
-            // 在元素淡出后移除它
+            // Remove element after fade out
             bookmarkItem.remove();
             
-            // 更新书签顺序存储
+            // Update bookmark order storage
             if (window.app && window.app.dragManager) {
               window.app.dragManager.saveBookmarkOrder();
             }
             
-            // 更可靠地恢复滚动位置 - 使用多次尝试确保成功
+            // More reliably restore scroll position - use multiple attempts to ensure success
+            // Try immediately once
+            // Then try a few more times to ensure success
+            // Finally use requestAnimationFrame to ensure restoration after rendering
             const restoreScroll = () => {
-              console.log("尝试恢复到滚动位置:", scrollPosition);
+              console.log("Try to restore scroll position:", scrollPosition);
               window.scrollTo(0, scrollPosition);
             };
             
-            // 立即尝试一次
+            // Immediately try once
             restoreScroll();
             
-            // 然后再尝试几次，以确保能成功
+            // Then try a few more times to ensure success
             setTimeout(restoreScroll, 50);
             setTimeout(restoreScroll, 150);
             
-            // 最后一次使用requestAnimationFrame确保在渲染后恢复
+            // Finally use requestAnimationFrame to ensure restoration after rendering
             setTimeout(() => {
               requestAnimationFrame(restoreScroll);
             }, 300);
@@ -221,12 +224,12 @@ export class ModalManager {
       }
     });
     
-    // 绑定取消事件
+    // Bind cancel event
     newCancelBtn.addEventListener('click', () => {
       this.closeActiveModal();
     });
     
-    // 显示模态框
+    // Show modal
     this.showModal(modal);
   }
 

@@ -178,7 +178,7 @@
   color: #ffffff;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 768px) {
   .command-palette {
     width: 90%;
@@ -189,14 +189,14 @@
   }
 }
 
-/* 书签高亮效果 */
+/* Bookmark highlight effect */
 .bookmark-item.highlight {
   animation: highlight-pulse 2s ease-in-out;
   z-index: 10 !important;
   position: relative !important;
 }
 
-/* 默认主题的增强定位动画 */
+/* Enhanced positioning animation for default theme */
 @keyframes highlight-pulse {
   0% {
     background-color: rgba(37, 99, 235, 0);
@@ -225,7 +225,7 @@
   }
 }
 
-/* 深色主题的增强定位动画 */
+/* Enhanced positioning animation for dark theme */
 [data-theme="dark"] .bookmark-item.highlight {
   animation: highlight-pulse-dark 2s ease-in-out;
 }
@@ -258,7 +258,7 @@
   }
 }
 
-/* 绿色主题的增强定位动画 */
+/* Enhanced positioning animation for green theme */
 [data-theme="green"] .bookmark-item.highlight {
   animation: highlight-pulse-green 2s ease-in-out;
 }
@@ -291,7 +291,7 @@
   }
 }
 
-/* 紫色主题的增强定位动画 */
+/* Enhanced positioning animation for purple theme */
 [data-theme="purple"] .bookmark-item.highlight {
   animation: highlight-pulse-purple 2s ease-in-out;
 }
@@ -324,7 +324,7 @@
   }
 }
 
-/* 高对比度主题的强烈定位动画 */
+/* Strong positioning animation for high contrast theme */
 [data-theme="high-contrast"] .bookmark-item.highlight {
   animation: highlight-pulse-high-contrast 2s ease-in-out;
 }
@@ -362,7 +362,7 @@
   }
 }
 
-/* 确保高对比度主题中文本在动画期间可读 */
+/* Ensure text readability during animation in high contrast theme */
 [data-theme="high-contrast"] .bookmark-item.highlight .bookmark-title {
   color: inherit !important;
 }
