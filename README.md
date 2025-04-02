@@ -164,7 +164,7 @@ Chen Yifeng
 
 ## Version History
 
-- 1.0.1
+- 1.1.0
   - Added column title editing feature with double-click interaction
   - Added visual feedback for editable and non-editable columns
   - Improved column header interaction with drag handle
