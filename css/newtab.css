@@ -339,9 +339,10 @@ main {
   justify-content: space-between;
   align-items: center;
   transition: background-color 0.3s, color 0.3s;
+  cursor: default;
 }
 
-.column-header:hover {
+.column-header .column-drag-handle {
   cursor: move;
 }
 
@@ -351,6 +352,61 @@ main {
   color: var(--text-primary);
   flex-grow: 1;
   margin: 0 0.5rem;
+  position: relative;
+  cursor: pointer;
+}
+
+/* 排除特殊列的 tooltip */
+.kanban-column[data-column-type="uncategorized"] .column-title,
+.kanban-column[data-folder-id="2"] .column-title,
+.kanban-column[data-folder-id="3"] .column-title {
+  position: static;
+}
+
+.column-title:hover::before {
+  content: "Double click to edit title";
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.kanban-column[data-column-type="uncategorized"] .column-title:hover::before,
+.kanban-column[data-folder-id="2"] .column-title:hover::before,
+.kanban-column[data-folder-id="3"] .column-title:hover::before {
+  content: none;
+}
+
+.kanban-column[data-column-type="uncategorized"] .column-title,
+.kanban-column[data-folder-id="2"] .column-title,
+.kanban-column[data-folder-id="3"] .column-title {
+  cursor: default;
+}
+
+.kanban-column[data-column-type="uncategorized"] .column-title:hover::after,
+.kanban-column[data-folder-id="2"] .column-title:hover::after,
+.kanban-column[data-folder-id="3"] .column-title:hover::after {
+  content: "Special column - Cannot be renamed";
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
 }
 
 .bookmark-count {
@@ -869,4 +925,49 @@ main {
   background-color: #848282;
   color: #fffefe;
   border-color: #000000;
+}
+
+/* Column title edit styles */
+.column-title-edit {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+  padding: 4px 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  width: 100%;
+  margin: 0;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.column-title-edit:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+}
+
+/* Special column tooltip */
+.kanban-column[data-column-type="uncategorized"] .column-header,
+.kanban-column[data-folder-id="2"] .column-header,
+.kanban-column[data-folder-id="3"] .column-header {
+  position: relative;
+}
+
+.kanban-column[data-column-type="uncategorized"] .column-header::after,
+.kanban-column[data-folder-id="2"] .column-header::after,
+.kanban-column[data-folder-id="3"] .column-header::after {
+  content: "ⓘ";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  color: var(--text-light);
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
 }

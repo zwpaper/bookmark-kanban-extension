@@ -50,13 +50,13 @@ export class UIManager {
     try {
       const success = await themeManager.switchTheme(theme);
       if (success) {
-        this.showThemeToast('主题已更新', 'success');
+        this.showThemeToast('Theme updated successfully', 'success');
       } else {
-        this.showThemeToast('主题更新失败', 'error');
+        this.showThemeToast('Theme update failed', 'error');
       }
     } catch (error) {
-      console.error('切换主题失败:', error);
-      this.showThemeToast('主题更新失败', 'error');
+      console.error('Theme switch failed:', error);
+      this.showThemeToast('Theme update failed', 'error');
     }
   }
 
@@ -262,32 +262,39 @@ export class UIManager {
   processBookmarkFolder(folder, container, savedBookmarkOrder) {
     const column = document.createElement('div');
     column.className = 'kanban-column';
+    column.dataset.columnType = 'folder';
     column.dataset.folderId = folder.id;
     
-    // Create column header
     const header = document.createElement('div');
     header.className = 'column-header';
-
-    // Add drag handle
+    
+    // 添加拖动图标
     const dragHandle = document.createElement('div');
     dragHandle.className = 'column-drag-handle';
-    dragHandle.innerHTML = '⠿';  // Simple drag icon
+    dragHandle.innerHTML = '⠿';  // 简单的拖动图标
     dragHandle.title = 'Drag to reorder';
     header.appendChild(dragHandle);
     
     const title = document.createElement('div');
     title.className = 'column-title';
     title.textContent = folder.title;
-    header.appendChild(title);
     
-    // Add bookmark count
-    const bookmarkCount = this.countBookmarksInFolder(folder);
     const count = document.createElement('div');
-    count.className = 'bookmark-count';
-    count.textContent = bookmarkCount;
-    header.appendChild(count);
+    count.className = 'column-count';
+    count.textContent = this.countBookmarksInFolder(folder);
     
+    header.appendChild(title);
+    header.appendChild(count);
     column.appendChild(header);
+    
+    // 添加双击事件处理
+    header.addEventListener('dblclick', (e) => {
+      // 确保点击在标题上，而不是拖动手柄或计数器上
+      if (e.target.classList.contains('column-title') ||
+          e.target.closest('.column-title')) {
+        this.handleColumnTitleEdit(column);
+      }
+    });
     
     // Create bookmark list
     const bookmarkList = document.createElement('div');
@@ -348,38 +355,39 @@ export class UIManager {
   createBookmarkColumn(title, bookmarks, container, folderId, savedBookmarkOrder) {
     const column = document.createElement('div');
     column.className = 'kanban-column';
+    column.dataset.columnType = 'folder';
+    column.dataset.folderId = folderId;
     
-    // Handle special column types
-    if (folderId) {
-      column.dataset.folderId = folderId;
-    } else if (title === 'Uncategorized') {
-      // Mark uncategorized column with a special attribute
-      column.dataset.columnType = 'uncategorized';
-    }
-    
-    // Create column header
     const header = document.createElement('div');
     header.className = 'column-header';
-
-    // Add drag handle
+    
+    // 添加拖动图标
     const dragHandle = document.createElement('div');
     dragHandle.className = 'column-drag-handle';
-    dragHandle.innerHTML = '⠿';  // Simple drag icon
+    dragHandle.innerHTML = '⠿';  // 简单的拖动图标
     dragHandle.title = 'Drag to reorder';
     header.appendChild(dragHandle);
     
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'column-title';
-    titleDiv.textContent = title;
-    header.appendChild(titleDiv);
+    const titleElement = document.createElement('div');
+    titleElement.className = 'column-title';
+    titleElement.textContent = title;
     
-    // Add bookmark count
     const count = document.createElement('div');
-    count.className = 'bookmark-count';
+    count.className = 'column-count';
     count.textContent = bookmarks.length;
-    header.appendChild(count);
     
+    header.appendChild(titleElement);
+    header.appendChild(count);
     column.appendChild(header);
+    
+    // 添加双击事件处理
+    header.addEventListener('dblclick', (e) => {
+      // 确保点击在标题上，而不是拖动手柄或计数器上
+      if (e.target.classList.contains('column-title') ||
+          e.target.closest('.column-title')) {
+        this.handleColumnTitleEdit(column);
+      }
+    });
     
     // Create bookmark list
     const bookmarkList = document.createElement('div');
@@ -651,5 +659,170 @@ export class UIManager {
         }
       }, 300);
     }
+  }
+
+  /**
+   * 处理列标题编辑
+   * @param {HTMLElement} columnElement 列元素
+   */
+  handleColumnTitleEdit(columnElement) {
+    // Get column type and ID
+    const columnType = columnElement.dataset.columnType;
+    const folderId = columnElement.dataset.folderId;
+    const titleElement = columnElement.querySelector('.column-title');
+    const originalTitle = titleElement.textContent;
+    
+    // Check if it's a special column
+    if (columnType === 'uncategorized') {
+      this.showSpecialColumnEditMessage('Uncategorized column cannot be renamed. You can drag these bookmarks to other columns to organize them.');
+      return;
+    }
+    
+    // Check if it's a Chrome special folder
+    if (folderId === '2' || folderId === '3') {
+      const folderName = folderId === '2' ? 'Other Bookmarks' : 'Mobile Bookmarks';
+      this.showSpecialColumnEditMessage(`"${folderName}" is a Chrome special folder and cannot be renamed directly. Consider creating a new folder and organizing these bookmarks into more meaningful categories.`);
+      return;
+    }
+    
+    // Create edit input box
+    const inputElement = document.createElement('input');
+    inputElement.type = 'text';
+    inputElement.className = 'column-title-edit';
+    inputElement.value = originalTitle;
+    inputElement.style.width = '100%';
+    inputElement.style.padding = '4px';
+    inputElement.style.border = '1px solid var(--primary-color)';
+    inputElement.style.borderRadius = 'var(--border-radius)';
+    inputElement.style.fontSize = titleElement.style.fontSize || '1.2rem';
+    
+    // Replace title element with input box
+    titleElement.style.display = 'none';
+    titleElement.parentNode.insertBefore(inputElement, titleElement.nextSibling);
+    
+    // Focus input box and select all text
+    inputElement.focus();
+    inputElement.select();
+    
+    // Handle input box events
+    inputElement.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const newTitle = inputElement.value.trim();
+        
+        // Validate new title
+        if (!newTitle) {
+          inputElement.style.borderColor = 'var(--danger-color)';
+          return;
+        }
+        
+        // Save changes
+        await this.saveColumnTitle(folderId, newTitle, titleElement);
+        
+        // Restore UI
+        this.finishTitleEdit(inputElement, titleElement);
+      } else if (e.key === 'Escape') {
+        // Cancel edit
+        this.finishTitleEdit(inputElement, titleElement);
+      }
+    });
+    
+    // Handle blur event
+    inputElement.addEventListener('blur', () => {
+      // Simple delay to allow Enter key event to process first
+      setTimeout(() => {
+        if (document.body.contains(inputElement)) {
+          this.finishTitleEdit(inputElement, titleElement);
+        }
+      }, 100);
+    });
+  }
+
+  /**
+   * Complete title editing
+   * @param {HTMLInputElement} inputElement Input element
+   * @param {HTMLElement} titleElement Title element
+   */
+  finishTitleEdit(inputElement, titleElement) {
+    titleElement.style.display = '';
+    if (inputElement.parentNode) {
+      inputElement.parentNode.removeChild(inputElement);
+    }
+  }
+
+  /**
+   * Save column title
+   * @param {string} folderId Folder ID
+   * @param {string} newTitle New title
+   * @param {HTMLElement} titleElement Title element
+   */
+  async saveColumnTitle(folderId, newTitle, titleElement) {
+    try {
+      // Update bookmark folder title using Chrome API
+      const result = await chrome.bookmarks.update(folderId, { title: newTitle });
+      
+      // Update UI
+      titleElement.textContent = result.title;
+      
+      // Show success message
+      this.showToast(`Column title has been updated to "${newTitle}"`, 'success');
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to update column title:', error);
+      this.showToast('Failed to update column title', 'error');
+      return false;
+    }
+  }
+
+  /**
+   * Show special column edit message
+   * @param {string} message Message content
+   */
+  showSpecialColumnEditMessage(message) {
+    this.showToast(message, 'info', 5000); // Show for longer duration
+  }
+
+  /**
+   * Show message prompt
+   * @param {string} message Message content
+   * @param {string} type Message type
+   * @param {number} duration Display duration (milliseconds)
+   */
+  showToast(message, type = 'info', duration = 3000) {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.padding = '10px 15px';
+    toast.style.backgroundColor = 
+      type === 'error' ? 'var(--danger-color)' : 
+      type === 'success' ? 'var(--success-color)' : 
+      'var(--primary-color)';
+    toast.style.color = 'white';
+    toast.style.borderRadius = 'var(--border-radius)';
+    toast.style.boxShadow = 'var(--shadow)';
+    toast.style.zIndex = '9999';
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s ease';
+    toast.style.maxWidth = '80%';
+    toast.style.wordBreak = 'break-word';
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.opacity = '1';
+    }, 10);
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
+    }, duration);
   }
 }

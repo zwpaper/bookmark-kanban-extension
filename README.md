@@ -10,22 +10,15 @@ A Chrome extension that displays your bookmarks in a visual kanban board layout,
 
 ## Features
 
-📋 Visual kanban board layout for bookmarks
-🎯 Drag and drop functionality for easy organization
-📱 Responsive design that works on all screen sizes
-🔄 Real-time bookmark updates
-🎨 Clean and modern interface
-🔍 Quick access to your bookmarks
-📊 Visual organization of bookmarks by category
-🕒 Date and time display on the new tab page
-💾 Layout persistence (columns and bookmarks order is saved)
-🎨 Multiple theme options (Default, Dark, Green, Purple, High Contrast)
-🔍 VS Code style command palette for quick bookmark search and navigation
-🎯 Enhanced visual feedback for search results across all themes
-♿ Improved accessibility with high contrast animations
-📝 Flexible display modes (single-line and double-line layouts)
-🎨 Simplified interface with clean typography
+1. **📋 Visual Kanban Board Layout** - Organize bookmarks in a clean, intuitive column-based interface with drag-and-drop functionality
 
+2. **🔍 Powerful Command Palette** - VS Code-style quick search for instantly finding and navigating to any bookmark
+
+3. **🎨 Customizable Appearance** - Multiple themes (Default, Dark, Green, Purple, High Contrast) and display modes (single/double line)
+
+4. **💾 Layout Persistence** - Automatically saves your custom column and bookmark arrangement across sessions
+
+5. **🔄 Real-time Synchronization** - Instant updates when bookmarks are added, edited, or removed in Chrome
 
 ## Installation
 
@@ -170,6 +163,12 @@ If you encounter any issues or have suggestions, please:
 Chen Yifeng
 
 ## Version History
+
+- 1.0.1
+  - Added column title editing feature with double-click interaction
+  - Added visual feedback for editable and non-editable columns
+  - Improved column header interaction with drag handle
+  - Enhanced user experience with clear feedback messages
 
 - 1.0.0
   - Added VS Code style command palette for quick bookmark search
