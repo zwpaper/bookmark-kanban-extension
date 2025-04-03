@@ -164,6 +164,17 @@ Chen Yifeng
 
 ## Version History
 
+- 1.2.0
+  - Enhanced bookmark availability checking
+    - Replaced automatic periodic checks with manual check button
+    - Optimized checking algorithm using DNS resolution and favicon checks
+    - Added certificate error status display (yellow warning)
+    - Implemented parallel checking for improved speed
+    - Added progress indicator during checks
+    - Used session storage for check results
+    - Skipped local network address checks
+    - Added 24-hour check cache for better performance
+
 - 1.1.0
   - Added column title editing feature with double-click interaction
   - Added visual feedback for editable and non-editable columns

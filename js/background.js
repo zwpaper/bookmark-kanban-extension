@@ -8,6 +8,27 @@
 
 import { siteChecker } from './modules/siteChecker.js';
 
+// Store check results in memory for current session
+let currentSessionResults = {};
+
+// Initialize storage when browser starts or extension is loaded
+const initSessionStorage = async () => {
+  // Check if session storage is supported
+  if (chrome.storage.session) {
+    try {
+      // Initialize session storage
+      await chrome.storage.session.clear();
+      currentSessionResults = {};
+      console.log('Session storage initialized');
+    } catch (error) {
+      console.error('Failed to initialize session storage:', error);
+    }
+  }
+};
+
+// Initialize on extension startup
+initSessionStorage();
+
 // Listen for installation
 chrome.runtime.onInstalled.addListener(() => {
   // Initialize extension settings
@@ -18,7 +39,7 @@ chrome.runtime.onInstalled.addListener(() => {
     }
   });
 
-  scheduleNextCheck();
+  // scheduleNextCheck(); // Removed automatic checking
 });
 
 // Listen for messages from content scripts or popup
@@ -56,17 +77,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'CHECK_BOOKMARKS') {
-    // 手动触发书签检测
+    // Manual bookmark check triggered
     console.log('Manual bookmark check triggered');
-    checkAllBookmarks().then(() => {
-      console.log('Manual bookmark check completed successfully');
-      sendResponse({ success: true });
+    
+    // Create a helper function for safe response
+    const safeResponse = (data) => {
+      try {
+        sendResponse(data);
+      } catch (error) {
+        console.error('Error sending response:', error);
+      }
+    };
+    
+    // Start check but send initial response immediately
+    safeResponse({ started: true });
+    
+    // Continue with the check
+    checkAllBookmarks().then((result) => {
+      console.log('Manual bookmark check completed successfully', result);
+      // No need to call sendResponse again as we already responded
     }).catch(error => {
       console.error('Manual check failed:', error);
-      sendResponse({ success: false, error: error.message });
+      // No need to call sendResponse again as we already responded
     });
-    return true;
+    
+    return false; // We already responded, no need to keep channel open
   }
+  
+  // Return false to indicate no async response needed
+  return false;
 });
 
 // Listen for bookmark changes
@@ -123,83 +162,129 @@ chrome.action.onClicked.addListener((tab) => {
   }
 });
 
-// 初始化检测
-chrome.runtime.onStartup.addListener(() => {
-  scheduleNextCheck();
-});
-
-// 当浏览器空闲时执行检测
-chrome.idle.onStateChanged.addListener((state) => {
-  if (state === 'idle') {
-    scheduleNextCheck();
-  }
-});
-
-function scheduleNextCheck() {
-  // 获取上次检测时间
-  chrome.storage.local.get('lastCheckTime', async (data) => {
-    const lastCheck = data.lastCheckTime || 0;
-    const now = Date.now();
-    
-    // 如果距离上次检测超过24小时，执行检测
-    if (now - lastCheck >= 24 * 60 * 60 * 1000) {
-      await checkAllBookmarks();
-      // 更新最后检测时间
-      chrome.storage.local.set({ 'lastCheckTime': now });
-    }
-  });
-}
-
-// 检查所有书签
+// Check all bookmarks
 async function checkAllBookmarks() {
-  console.log('=== Starting bookmark check... ===');
-  const bookmarks = await chrome.bookmarks.getTree();
-  const results = new Map();
-  let total = 0;
-  let checked = 0;
-  
-  // 首先计算总数
-  await traverseBookmarks(bookmarks, (bookmark) => {
-    if (bookmark.url) total++;
-  });
-  
-  console.log(`Found ${total} bookmarks to check`);
-  
-  await traverseBookmarks(bookmarks, async (bookmark) => {
-    if (bookmark.url) {
-      try {
-        const url = new URL(bookmark.url);
-        console.log(`Checking [${++checked}/${total}]: ${url.hostname}`);
-        const isAlive = await siteChecker.checkSite(url.hostname);
-        results.set(bookmark.id, isAlive);
-        console.log(`Result for ${url.hostname}: ${isAlive ? '✅ alive' : '❌ dead'}`);
-      } catch (error) {
-        console.error(`Error checking bookmark: ${bookmark.url}`, error);
-        results.set(bookmark.id, false); // 出错时标记为死站
-        console.log(`Result for ${bookmark.url}: ❌ error`);
-      }
-    }
-  });
-
-  // 存储检测结果
-  await chrome.storage.local.set({ 'siteStatus': Object.fromEntries(results) });
-  
-  // 通知所有标签页更新UI
-  chrome.tabs.query({}, (tabs) => {
-    tabs.forEach(tab => {
-      chrome.tabs.sendMessage(tab.id, {
-        type: 'SITE_STATUS_UPDATED',
-        siteStatus: Object.fromEntries(results)
-      }).catch(() => {
-        // 忽略非活动标签页的错误
+  try {
+    console.log('=== Starting bookmark check... ===');
+    const bookmarks = await chrome.bookmarks.getTree();
+    const results = new Map();
+    let total = 0;
+    let checked = 0;
+    
+    // First calculate total count
+    await traverseBookmarks(bookmarks, (bookmark) => {
+      if (bookmark.url) total++;
+    });
+    
+    console.log(`Found ${total} bookmarks to check`);
+    
+    // Send start message and total count to all tabs
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          type: 'CHECK_STARTED',
+          total: total
+        }).catch(() => {
+          // Ignore errors for inactive tabs
+        });
       });
     });
-  });
-  
-  console.log(`=== Bookmark check completed. Checked ${checked} bookmarks ===`);
+    
+    // Collect all bookmarks to check
+    const bookmarksToCheck = [];
+    await traverseBookmarks(bookmarks, (bookmark) => {
+      if (bookmark.url) {
+        try {
+          const url = new URL(bookmark.url);
+          bookmarksToCheck.push({ bookmark, url });
+        } catch (error) {
+          console.error(`Invalid URL: ${bookmark.url}`, error);
+        }
+      }
+    });
+    
+    // Process bookmarks in batches
+    const batchSize = 10; // Process 10 at a time
+    for (let i = 0; i < bookmarksToCheck.length; i += batchSize) {
+      const batch = bookmarksToCheck.slice(i, i + batchSize);
+      const promises = batch.map(async ({ bookmark, url }) => {
+        try {
+          const isAlive = await siteChecker.checkSite(url.hostname);
+          results.set(bookmark.id, isAlive);
+          console.log(`Result for ${url.hostname}: ${isAlive === true ? '✅ alive' : isAlive === 'certificate-error' ? '⚠️ cert error' : '❌ dead'}`);
+        } catch (error) {
+          console.error(`Error checking bookmark: ${bookmark.url}`, error);
+          results.set(bookmark.id, false);
+          console.log(`Result for ${bookmark.url}: ❌ error`);
+        }
+      });
+      
+      // Wait for current batch to complete
+      await Promise.all(promises);
+      
+      // Update progress
+      checked += batch.length;
+      
+      // Send progress update to all tabs
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach(tab => {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'CHECK_PROGRESS',
+            checked: checked,
+            total: total,
+            current: batch[batch.length - 1].url.hostname
+          }).catch(() => {
+            // Ignore errors for inactive tabs
+          });
+        });
+      });
+    }
+
+    // Convert to object format
+    currentSessionResults = Object.fromEntries(results);
+    
+    // Use chrome.storage.session if supported
+    if (chrome.storage.session) {
+      await chrome.storage.session.set({ 'siteStatus': currentSessionResults });
+    } else {
+      // Fallback: use local storage, but results will be lost on session end
+      await chrome.storage.local.set({ 'siteStatus': currentSessionResults });
+    }
+    
+    // Notify all tabs about completion
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          type: 'CHECK_COMPLETED',
+          siteStatus: currentSessionResults
+        }).catch(() => {
+          // Ignore errors for inactive tabs
+        });
+      });
+    });
+    
+    console.log(`=== Bookmark check completed. Checked ${checked} bookmarks ===`);
+    return { success: true, checkedCount: checked };
+  } catch (error) {
+    console.error('Bookmark check failed:', error);
+    
+    // Notify all tabs about failure
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, {
+          type: 'CHECK_FAILED',
+          error: error.message
+        }).catch(() => {
+          // Ignore errors for inactive tabs
+        });
+      });
+    });
+    
+    throw error; // Re-throw for caller to know
+  }
 }
 
-// 遍历书签的辅助函数
+// Helper function to traverse bookmarks
 async function traverseBookmarks(bookmarks, callback) {
   for (const bookmark of bookmarks) {
     if (bookmark.children) {

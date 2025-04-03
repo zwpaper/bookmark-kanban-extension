@@ -130,6 +130,72 @@ header {
   margin-left: auto;
 }
 
+/* Site check button */
+.header-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: var(--border-radius);
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.header-button:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.check-icon {
+  font-size: 1.1rem;
+  color: white;
+}
+
+.check-text {
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* 进度指示器样式 */
+.check-progress {
+  color: white;
+  font-size: 0.85rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 0px 8px;
+  margin-left: 4px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 当显示进度时，隐藏文字 */
+.checking .check-text {
+  display: none;
+}
+
+/* Add loading animation for the check button */
+.header-button.checking .check-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .check-text {
+    display: none;
+  }
+  
+  .header-button {
+    padding: 0.3rem;
+  }
+}
+
 /* Single Line Mode Styles */
 body[data-display-mode="single"] .bookmark-item {
   padding: 0.5rem 0.8rem;
@@ -996,4 +1062,20 @@ main {
 
 [data-theme="dark"] .bookmark-item[data-site-status="dead"] .bookmark-title::after {
   color: var(--danger-dark);
+}
+
+/* 证书错误但域名存在的样式 */
+.bookmark-item[data-site-status="cert-error"] {
+  opacity: 0.85;
+  border-left: 3px solid var(--warning-color); /* 使用警告色，如黄色 */
+}
+
+.bookmark-item[data-site-status="cert-error"] .bookmark-title {
+  color: var(--warning-color);
+}
+
+.bookmark-item[data-site-status="cert-error"] .bookmark-title::after {
+  content: " 🔒";  /* 锁图标表示证书问题 */
+  font-size: 0.8rem;
+  color: var(--warning-color);
 }

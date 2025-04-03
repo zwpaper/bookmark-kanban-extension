@@ -125,11 +125,17 @@ export class App {
         this.displayManager.applyDisplayMode(message.mode);
         sendResponse({ success: true });
       }
-      else if (message.type === 'SITE_STATUS_UPDATED') {
-        // Update site status
-        this.siteStatus = new Map(Object.entries(message.siteStatus));
-        this.updateBookmarkStatus();
-        sendResponse({ success: true });
+      else if (message.type === 'CHECK_STARTED') {
+        this.handleCheckStarted(message.total);
+      }
+      else if (message.type === 'CHECK_PROGRESS') {
+        this.handleCheckProgress(message.checked, message.total, message.current);
+      }
+      else if (message.type === 'CHECK_COMPLETED') {
+        this.handleCheckCompleted(message.siteStatus);
+      }
+      else if (message.type === 'CHECK_FAILED') {
+        this.handleCheckFailed(message.error);
       }
       // Return true to indicate asynchronous response
       return true;
@@ -137,16 +143,78 @@ export class App {
   }
 
   /**
+   * Handle check started event
+   */
+  handleCheckStarted(total) {
+    const checkButton = document.getElementById('check-sites-button');
+    const progressElement = checkButton.querySelector('.check-progress');
+    
+    checkButton.classList.add('checking');
+    progressElement.style.display = 'inline-block';
+    progressElement.textContent = `0/${total}`;
+  }
+
+  /**
+   * Handle check progress update
+   */
+  handleCheckProgress(checked, total, current) {
+    const checkButton = document.getElementById('check-sites-button');
+    const progressElement = checkButton.querySelector('.check-progress');
+    
+    progressElement.textContent = `${checked}/${total}`;
+    checkButton.title = `Checking: ${current}`;
+  }
+
+  /**
+   * Handle check completed event
+   */
+  handleCheckCompleted(siteStatus) {
+    const checkButton = document.getElementById('check-sites-button');
+    const progressElement = checkButton.querySelector('.check-progress');
+    
+    checkButton.classList.remove('checking');
+    progressElement.style.display = 'none';
+    checkButton.title = "Check bookmarks availability";
+    
+    // Update UI to reflect check results
+    this.updateBookmarkStatus(siteStatus);
+    
+    // Show completion message
+    const deadLinks = Object.values(siteStatus).filter(status => !status).length;
+    this.showToast(`Bookmark check completed! ${deadLinks} dead links found.`);
+  }
+
+  /**
+   * Handle check failed event
+   */
+  handleCheckFailed(errorMessage) {
+    const checkButton = document.getElementById('check-sites-button');
+    const progressElement = checkButton.querySelector('.check-progress');
+    
+    checkButton.classList.remove('checking');
+    progressElement.style.display = 'none';
+    checkButton.title = "Check bookmarks availability";
+    
+    this.showToast(`Bookmark check failed: ${errorMessage}`, 'error');
+  }
+
+  /**
    * Update bookmark status in UI
    */
-  updateBookmarkStatus() {
+  updateBookmarkStatus(siteStatus) {
     const bookmarkItems = document.querySelectorAll('.bookmark-item');
     bookmarkItems.forEach(item => {
       const bookmarkId = item.dataset.bookmarkId;
-      const isAlive = this.siteStatus.get(bookmarkId);
-      if (isAlive === false) {
+      const status = siteStatus[bookmarkId];
+      
+      if (status === false) {
+        // Completely unavailable
         item.setAttribute('data-site-status', 'dead');
+      } else if (status === 'certificate-error') {
+        // Certificate error but domain exists
+        item.setAttribute('data-site-status', 'cert-error');
       } else {
+        // Fully available
         item.removeAttribute('data-site-status');
       }
     });
@@ -175,6 +243,14 @@ export class App {
       }
       
       const target = e.target;
+      
+      // Handle check sites button click
+      if (target.closest('#check-sites-button')) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.handleSiteCheck();
+        return;
+      }
       
       // Handle edit button click
       if (target.closest('.edit-btn')) {
@@ -421,6 +497,39 @@ export class App {
       console.error('Failed to switch display mode:', error);
       this.showToast('Failed to switch display mode', 'error');
       return false;
+    }
+  }
+
+  /**
+   * Handle manual site check
+   */
+  async handleSiteCheck() {
+    const checkButton = document.getElementById('check-sites-button');
+    
+    // Prevent multiple clicks
+    if (checkButton.classList.contains('checking')) {
+      return;
+    }
+    
+    try {
+      // Send message to background service worker
+      await chrome.runtime.sendMessage({ 
+        type: 'CHECK_BOOKMARKS'
+      });
+      
+      // Progress updates will be handled by message listeners
+    } catch (error) {
+      console.error('Site check error:', error);
+      this.showToast('An error occurred during bookmark check', 'error');
+      
+      // Restore button appearance
+      const checkButton = document.getElementById('check-sites-button');
+      const progressElement = checkButton.querySelector('.check-progress');
+      if (checkButton && progressElement) {
+        checkButton.classList.remove('checking');
+        progressElement.style.display = 'none';
+        checkButton.title = "Check bookmarks availability";
+      }
     }
   }
 } 

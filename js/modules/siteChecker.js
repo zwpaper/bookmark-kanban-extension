@@ -18,11 +18,46 @@ export class SiteChecker {
   }
 
   /**
+   * Check if hostname is a local network address
+   * @param {string} hostname Hostname to check
+   * @returns {boolean} True if it's a local network address
+   */
+  isLocalNetwork(hostname) {
+    // Check for localhost and IP formats
+    if (hostname === 'localhost' || 
+        hostname === '127.0.0.1' || 
+        hostname.startsWith('192.168.') || 
+        hostname.startsWith('10.') || 
+        hostname.endsWith('.local')) {
+      return true;
+    }
+    
+    // Check for 172.16.x.x to 172.31.x.x range
+    if (hostname.startsWith('172.')) {
+      const parts = hostname.split('.');
+      if (parts.length >= 2) {
+        const secondPart = parseInt(parts[1], 10);
+        if (secondPart >= 16 && secondPart <= 31) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+
+  /**
    * Check website status
    * @param {string} hostname Hostname
    * @returns {Promise<boolean>} Whether website is available
    */
   async checkSite(hostname) {
+    // Skip checking for local network addresses
+    if (this.isLocalNetwork(hostname)) {
+      // Always consider local addresses as available
+      return true;
+    }
+    
     // Check cache
     if (!this.shouldRecheck(hostname)) {
       return this.getCachedStatus(hostname);
