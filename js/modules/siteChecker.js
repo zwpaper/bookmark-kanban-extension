@@ -74,22 +74,42 @@ export class SiteChecker {
    * @returns {Promise<boolean>}
    */
   async checkAvailability(hostname) {
-    // Build list of URLs to check
-    const urls = [
+    // 首先尝试 HTTPS
+    const httpsUrls = [
       `https://${hostname}/favicon.ico`,
-      `https://${hostname}/apple-touch-icon.png`,
+      `https://${hostname}/robots.txt`,
       `https://${hostname}`
     ];
 
-    // Try each URL in sequence
-    for (const url of urls) {
+    // 然后尝试 HTTP
+    const httpUrls = [
+      `http://${hostname}/favicon.ico`,
+      `http://${hostname}/robots.txt`,
+      `http://${hostname}`
+    ];
+
+    // 先尝试 HTTPS
+    for (const url of httpsUrls) {
       try {
         const available = await this.tryHeadRequest(url);
         if (available) {
           return true;
         }
       } catch (error) {
-        console.debug(`Failed to check URL: ${url}`, error);
+        console.debug(`Failed to check HTTPS URL: ${url}`, error);
+        continue;
+      }
+    }
+
+    // 如果 HTTPS 失败，尝试 HTTP
+    for (const url of httpUrls) {
+      try {
+        const available = await this.tryHeadRequest(url);
+        if (available) {
+          return true;
+        }
+      } catch (error) {
+        console.debug(`Failed to check HTTP URL: ${url}`, error);
         continue;
       }
     }
@@ -109,6 +129,7 @@ export class SiteChecker {
 
       const response = await fetch(url, {
         method: 'HEAD',
+        mode: 'no-cors',
         signal: controller.signal,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -116,10 +137,14 @@ export class SiteChecker {
       });
 
       clearTimeout(timeoutId);
-      return response.ok;
+      
+      // 在 no-cors 模式下，如果请求成功完成就认为网站可访问
+      return true;
     } catch (error) {
       if (error.name === 'AbortError') {
         console.debug(`Request timeout: ${url}`);
+      } else {
+        console.debug(`Request failed: ${url}`, error);
       }
       return false;
     }

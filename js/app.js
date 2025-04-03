@@ -14,6 +14,7 @@ export class App {
     this._isDeleteOperation = false;
     this.initialize();
     this.faviconObserver = null;
+    this.siteStatus = new Map();
     
     // Make app instance globally accessible for component interaction
     window.app = this;
@@ -47,6 +48,9 @@ export class App {
       
       // Set up message listeners for theme and display mode changes
       this.setupMessageListeners();
+      
+      // Load site status from storage
+      await this.loadSiteStatus();
       
       // Check if new tab feature is enabled
       const enabled = await this.checkNewTabEnabled();
@@ -93,6 +97,20 @@ export class App {
   }
 
   /**
+   * Load site status from storage
+   */
+  async loadSiteStatus() {
+    try {
+      const result = await chrome.storage.local.get('siteStatus');
+      if (result.siteStatus) {
+        this.siteStatus = new Map(Object.entries(result.siteStatus));
+      }
+    } catch (error) {
+      console.error('Failed to load site status:', error);
+    }
+  }
+
+  /**
    * Set message listeners, especially for theme and display mode change messages
    */
   setupMessageListeners() {
@@ -107,8 +125,30 @@ export class App {
         this.displayManager.applyDisplayMode(message.mode);
         sendResponse({ success: true });
       }
+      else if (message.type === 'SITE_STATUS_UPDATED') {
+        // Update site status
+        this.siteStatus = new Map(Object.entries(message.siteStatus));
+        this.updateBookmarkStatus();
+        sendResponse({ success: true });
+      }
       // Return true to indicate asynchronous response
       return true;
+    });
+  }
+
+  /**
+   * Update bookmark status in UI
+   */
+  updateBookmarkStatus() {
+    const bookmarkItems = document.querySelectorAll('.bookmark-item');
+    bookmarkItems.forEach(item => {
+      const bookmarkId = item.dataset.bookmarkId;
+      const isAlive = this.siteStatus.get(bookmarkId);
+      if (isAlive === false) {
+        item.setAttribute('data-site-status', 'dead');
+      } else {
+        item.removeAttribute('data-site-status');
+      }
     });
   }
 

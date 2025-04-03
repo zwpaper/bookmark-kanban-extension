@@ -134,6 +134,9 @@ header {
 body[data-display-mode="single"] .bookmark-item {
   padding: 0.5rem 0.8rem;
   height: 36px;
+  position: relative;
+  z-index: 1;
+  transition: z-index 0s linear 0.1s;
 }
 
 body[data-display-mode="single"] .bookmark-content {
@@ -162,13 +165,6 @@ body[data-display-mode="single"] .bookmark-actions {
   transform: translateY(-50%);
   gap: 4px;
   height: auto;
-}
-
-/* Tooltip for showing URL on hover in single-line mode */
-body[data-display-mode="single"] .bookmark-item {
-  position: relative;
-  z-index: 1;
-  transition: z-index 0s linear 0.1s;
 }
 
 body[data-display-mode="single"] .bookmark-item:hover {
@@ -205,8 +201,8 @@ body[data-display-mode="single"] .bookmark-list {
 }
 
 body[data-display-mode="single"] .bookmark-item:nth-last-child(-n+3):hover::after {
-  bottom: auto;
-  top: -28px;
+  bottom: -28px;
+  top: auto;
 }
 
 /* 确保 tooltip 显示在书签列表的最上层 */
@@ -970,4 +966,34 @@ main {
   align-items: center;
   justify-content: center;
   cursor: help;
+}
+
+/* 死站标识样式 */
+.bookmark-item[data-site-status="dead"] {
+  opacity: 0.7;
+  border-left: 3px solid var(--danger-color);
+}
+
+.bookmark-item[data-site-status="dead"] .bookmark-title {
+  color: var(--danger-color);
+}
+
+/* 所有模式下的死站标识统一使用图标 */
+.bookmark-item[data-site-status="dead"] .bookmark-title::after {
+  content: " ⚠️";
+  font-size: 0.8rem;
+  color: var(--danger-color);
+}
+
+/* 暗色主题下的死站标识 */
+[data-theme="dark"] .bookmark-item[data-site-status="dead"] {
+  border-left-color: var(--danger-dark);
+}
+
+[data-theme="dark"] .bookmark-item[data-site-status="dead"] .bookmark-title {
+  color: var(--danger-dark);
+}
+
+[data-theme="dark"] .bookmark-item[data-site-status="dead"] .bookmark-title::after {
+  color: var(--danger-dark);
 }

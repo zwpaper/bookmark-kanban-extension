@@ -534,7 +534,7 @@ export class UIManager {
     item.appendChild(actions);
     
     // Add click handler to open bookmark
-    content.addEventListener('click', (e) => {
+    item.addEventListener('click', (e) => {
       if (!e.target.closest('.bookmark-action')) {
         window.open(bookmark.url, '_blank');
       }
