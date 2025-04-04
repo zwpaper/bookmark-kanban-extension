@@ -164,6 +164,9 @@ Chen Yifeng
 
 ## Version History
 
+- 1.2.1
+  - Optimized site checking logic for better performance
+
 - 1.2.0
   - Enhanced bookmark availability checking
     - Replaced automatic periodic checks with manual check button

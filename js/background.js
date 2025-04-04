@@ -11,6 +11,16 @@ import { siteChecker } from './modules/siteChecker.js';
 // Store check results in memory for current session
 let currentSessionResults = {};
 
+// Debug mode flag - 设置为 false 以禁用调试日志
+const isDebug = false;
+
+// Debug log helper
+function _debug(...args) {
+  if (isDebug) {
+    console.debug(...args);
+  }
+}
+
 // Initialize storage when browser starts or extension is loaded
 const initSessionStorage = async () => {
   // Check if session storage is supported
@@ -19,9 +29,9 @@ const initSessionStorage = async () => {
       // Initialize session storage
       await chrome.storage.session.clear();
       currentSessionResults = {};
-      console.log('Session storage initialized');
+      _debug('Session storage initialized');
     } catch (error) {
-      console.error('Failed to initialize session storage:', error);
+      _debug('Failed to initialize session storage');
     }
   }
 };
@@ -78,14 +88,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'CHECK_BOOKMARKS') {
     // Manual bookmark check triggered
-    console.log('Manual bookmark check triggered');
+    _debug('Manual bookmark check triggered');
     
     // Create a helper function for safe response
     const safeResponse = (data) => {
       try {
         sendResponse(data);
       } catch (error) {
-        console.error('Error sending response:', error);
+        _debug('Error sending response');
       }
     };
     
@@ -94,11 +104,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     
     // Continue with the check
     checkAllBookmarks().then((result) => {
-      console.log('Manual bookmark check completed successfully', result);
-      // No need to call sendResponse again as we already responded
-    }).catch(error => {
-      console.error('Manual check failed:', error);
-      // No need to call sendResponse again as we already responded
+      _debug('Manual bookmark check completed successfully');
+    }).catch(() => {
+      _debug('Manual check failed');
     });
     
     return false; // We already responded, no need to keep channel open
@@ -165,7 +173,7 @@ chrome.action.onClicked.addListener((tab) => {
 // Check all bookmarks
 async function checkAllBookmarks() {
   try {
-    console.log('=== Starting bookmark check... ===');
+    _debug('=== Starting bookmark check... ===');
     const bookmarks = await chrome.bookmarks.getTree();
     const results = new Map();
     let total = 0;
@@ -176,7 +184,7 @@ async function checkAllBookmarks() {
       if (bookmark.url) total++;
     });
     
-    console.log(`Found ${total} bookmarks to check`);
+    _debug(`Found ${total} bookmarks to check`);
     
     // Send start message and total count to all tabs
     chrome.tabs.query({}, (tabs) => {
@@ -198,24 +206,29 @@ async function checkAllBookmarks() {
           const url = new URL(bookmark.url);
           bookmarksToCheck.push({ bookmark, url });
         } catch (error) {
-          console.error(`Invalid URL: ${bookmark.url}`, error);
+          _debug(`Invalid URL skipped: ${bookmark.url}`);
         }
       }
     });
     
     // Process bookmarks in batches
-    const batchSize = 10; // Process 10 at a time
+    const batchSize = 10;
     for (let i = 0; i < bookmarksToCheck.length; i += batchSize) {
       const batch = bookmarksToCheck.slice(i, i + batchSize);
       const promises = batch.map(async ({ bookmark, url }) => {
         try {
           const isAlive = await siteChecker.checkSite(url.hostname);
           results.set(bookmark.id, isAlive);
-          console.log(`Result for ${url.hostname}: ${isAlive === true ? '✅ alive' : isAlive === 'certificate-error' ? '⚠️ cert error' : '❌ dead'}`);
+          // 只在调试模式下输出详细结果
+          if (isDebug) {
+            const status = isAlive === true ? '✅' : 
+                          isAlive === 'certificate-error' ? '⚠️' : 
+                          isAlive === 'no-https' ? '🔓' : '🚫';
+            _debug(`${status} ${url.hostname}`);
+          }
         } catch (error) {
-          console.error(`Error checking bookmark: ${bookmark.url}`, error);
           results.set(bookmark.id, false);
-          console.log(`Result for ${bookmark.url}: ❌ error`);
+          _debug(`Check failed: ${url.hostname}`);
         }
       });
       
@@ -247,7 +260,7 @@ async function checkAllBookmarks() {
     if (chrome.storage.session) {
       await chrome.storage.session.set({ 'siteStatus': currentSessionResults });
     } else {
-      // Fallback: use local storage, but results will be lost on session end
+      // Fallback: use local storage
       await chrome.storage.local.set({ 'siteStatus': currentSessionResults });
     }
     
@@ -263,24 +276,24 @@ async function checkAllBookmarks() {
       });
     });
     
-    console.log(`=== Bookmark check completed. Checked ${checked} bookmarks ===`);
+    _debug(`=== Bookmark check completed. Checked ${checked} bookmarks ===`);
     return { success: true, checkedCount: checked };
   } catch (error) {
-    console.error('Bookmark check failed:', error);
+    _debug('Bookmark check failed');
     
     // Notify all tabs about failure
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'CHECK_FAILED',
-          error: error.message
+          error: 'Check failed'
         }).catch(() => {
           // Ignore errors for inactive tabs
         });
       });
     });
     
-    throw error; // Re-throw for caller to know
+    throw error;
   }
 }
 

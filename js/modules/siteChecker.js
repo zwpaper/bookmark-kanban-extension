@@ -9,12 +9,41 @@ export class SiteChecker {
     
     // Cache duration configuration (milliseconds)
     this.CACHE_DURATION = {
-      SUCCESS: 24 * 60 * 60 * 1000,  // Success status cache 24 hours
-      FAILURE: 1 * 60 * 60 * 1000    // Failure status cache 1 hour
+      SUCCESS: 24 * 60 * 60 * 1000,     // Success status cache 24 hours
+      FAILURE: 1 * 60 * 60 * 1000,      // Failure status cache 1 hour
+      CERT_ERROR: 12 * 60 * 60 * 1000,  // Certificate error cache 12 hours
+      NO_HTTPS: 12 * 60 * 60 * 1000     // No HTTPS support cache 12 hours
     };
     
     // Request timeout (milliseconds)
     this.TIMEOUT = 5000;
+    
+    // Maximum cache size
+    this.MAX_CACHE_SIZE = 500;
+    
+    // Initialize periodic cache cleanup
+    this.initCacheCleanup();
+    
+    // Debug mode flag - 设置为 false 以禁用调试日志
+    this.isDebug = false;
+  }
+
+  /**
+   * Debug log helper
+   * @private
+   */
+  _debug(...args) {
+    if (this.isDebug) {
+      console.debug(...args);
+    }
+  }
+
+  /**
+   * Initialize periodic cache cleanup
+   */
+  initCacheCleanup() {
+    // Clean cache every 15 minutes
+    setInterval(() => this.cleanupCache(), 15 * 60 * 1000);
   }
 
   /**
@@ -49,12 +78,11 @@ export class SiteChecker {
   /**
    * Check website status
    * @param {string} hostname Hostname
-   * @returns {Promise<boolean>} Whether website is available
+   * @returns {Promise<boolean|string>} Whether website is available or certificate error
    */
   async checkSite(hostname) {
     // Skip checking for local network addresses
     if (this.isLocalNetwork(hostname)) {
-      // Always consider local addresses as available
       return true;
     }
     
@@ -64,11 +92,11 @@ export class SiteChecker {
     }
 
     try {
-      const available = await this.checkAvailability(hostname);
-      this.updateCache(hostname, available);
-      return available;
+      const status = await this.checkAvailability(hostname);
+      this.updateCache(hostname, status);
+      return status;
     } catch (error) {
-      console.error(`Failed to check website: ${hostname}`, error);
+      this._debug(`Site check failed for ${hostname}`); // 简化错误输出
       this.updateCache(hostname, false);
       return false;
     }
@@ -77,7 +105,7 @@ export class SiteChecker {
   /**
    * Get cached status
    * @param {string} hostname Hostname
-   * @returns {boolean|null} Cached status, null if no cache
+   * @returns {boolean|string|null} Cached status, null if no cache
    */
   getCachedStatus(hostname) {
     if (this.isCacheValid(hostname)) {
@@ -98,15 +126,27 @@ export class SiteChecker {
 
     const lastCheck = this.checkTimes.get(hostname);
     const status = this.siteStatus.get(hostname);
-    const cacheDuration = status ? this.CACHE_DURATION.SUCCESS : this.CACHE_DURATION.FAILURE;
+    const cacheDuration = this.getCacheDuration(status);
     
     return Date.now() - lastCheck > cacheDuration;
   }
 
   /**
+   * Get cache duration based on status
+   * @param {boolean|string} status Status
+   * @returns {number} Cache duration in milliseconds
+   */
+  getCacheDuration(status) {
+    if (status === true) return this.CACHE_DURATION.SUCCESS;
+    if (status === 'certificate-error') return this.CACHE_DURATION.CERT_ERROR;
+    if (status === 'no-https') return this.CACHE_DURATION.NO_HTTPS;
+    return this.CACHE_DURATION.FAILURE;
+  }
+
+  /**
    * Perform availability check
    * @param {string} hostname Hostname
-   * @returns {Promise<boolean>}
+   * @returns {Promise<boolean|string>}
    */
   async checkAvailability(hostname) {
     // 首先尝试 HTTPS
@@ -123,15 +163,18 @@ export class SiteChecker {
       `http://${hostname}`
     ];
 
+    let httpsError = null;
+
     // 先尝试 HTTPS
     for (const url of httpsUrls) {
       try {
         const available = await this.tryHeadRequest(url);
         if (available) {
-          return true;
+          return true; // HTTPS 访问成功
         }
       } catch (error) {
-        console.debug(`Failed to check HTTPS URL: ${url}`, error);
+        httpsError = error;
+        this._debug(`HTTPS check failed: ${url}`); // 简化错误输出
         continue;
       }
     }
@@ -141,15 +184,47 @@ export class SiteChecker {
       try {
         const available = await this.tryHeadRequest(url);
         if (available) {
-          return true;
+          return 'no-https'; // HTTP 访问成功，但不支持 HTTPS
         }
       } catch (error) {
-        console.debug(`Failed to check HTTP URL: ${url}`, error);
+        this._debug(`HTTP check failed: ${url}`); // 简化错误输出
         continue;
       }
     }
 
-    return false;
+    // 如果 HTTP 和 HTTPS 都失败，检查域名是否存在
+    const domainExists = await this.checkDomainExists(hostname);
+    if (domainExists) {
+      // 如果域名存在，且之前的 HTTPS 错误是证书相关的，则标记为证书错误
+      if (httpsError && 
+          (httpsError.name === 'TypeError' && httpsError.message.includes('Failed to fetch'))) {
+        return 'certificate-error';
+      }
+    }
+
+    return false; // 完全无法访问
+  }
+
+  /**
+   * Check if domain exists through DNS
+   * @param {string} hostname Hostname
+   * @returns {Promise<boolean>} Whether domain resolves
+   */
+  async checkDomainExists(hostname) {
+    return new Promise(resolve => {
+      const img = new Image();
+      const timeoutId = setTimeout(() => {
+        img.src = '';
+        resolve(false);
+      }, 2000);
+      
+      img.onload = img.onerror = () => {
+        clearTimeout(timeoutId);
+        resolve(true);
+      };
+      
+      img.src = `https://${hostname}/favicon.ico?nocache=${Date.now()}`;
+    });
   }
 
   /**
@@ -172,16 +247,14 @@ export class SiteChecker {
       });
 
       clearTimeout(timeoutId);
-      
-      // 在 no-cors 模式下，如果请求成功完成就认为网站可访问
       return true;
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.debug(`Request timeout: ${url}`);
+        this._debug(`Request timeout: ${url}`); // 使用 debug helper
       } else {
-        console.debug(`Request failed: ${url}`, error);
+        this._debug(`Request failed: ${url}`); // 简化错误输出
       }
-      return false;
+      throw error;
     }
   }
 
@@ -197,7 +270,7 @@ export class SiteChecker {
 
     const lastCheck = this.checkTimes.get(hostname);
     const status = this.siteStatus.get(hostname);
-    const cacheDuration = status ? this.CACHE_DURATION.SUCCESS : this.CACHE_DURATION.FAILURE;
+    const cacheDuration = this.getCacheDuration(status);
     
     return Date.now() - lastCheck <= cacheDuration;
   }
@@ -205,11 +278,58 @@ export class SiteChecker {
   /**
    * Update cache
    * @param {string} hostname Hostname
-   * @param {boolean} status Status
+   * @param {boolean|string} status Status
    */
   updateCache(hostname, status) {
+    // 检查缓存大小限制
+    if (this.siteStatus.size >= this.MAX_CACHE_SIZE) {
+      this.limitCacheSize();
+    }
+    
     this.siteStatus.set(hostname, status);
     this.checkTimes.set(hostname, Date.now());
+  }
+
+  /**
+   * Clean up expired cache entries
+   */
+  cleanupCache() {
+    const now = Date.now();
+    const expiredHosts = [];
+    
+    for (const [hostname, timestamp] of this.checkTimes.entries()) {
+      const status = this.siteStatus.get(hostname);
+      const cacheDuration = this.getCacheDuration(status);
+      
+      if (now - timestamp > cacheDuration) {
+        expiredHosts.push(hostname);
+      }
+    }
+    
+    expiredHosts.forEach(hostname => {
+      this.siteStatus.delete(hostname);
+      this.checkTimes.delete(hostname);
+    });
+    
+    this._debug(`Cache cleanup: removed ${expiredHosts.length} entries`); // 使用 debug helper
+  }
+
+  /**
+   * Limit cache size by removing oldest entries
+   */
+  limitCacheSize() {
+    const entries = Array.from(this.checkTimes.entries());
+    entries.sort((a, b) => a[1] - b[1]);
+    
+    const removeCount = Math.ceil(this.MAX_CACHE_SIZE * 0.2);
+    const toRemove = entries.slice(0, removeCount);
+    
+    toRemove.forEach(([hostname]) => {
+      this.siteStatus.delete(hostname);
+      this.checkTimes.delete(hostname);
+    });
+    
+    this._debug(`Cache size limited: removed ${toRemove.length} entries`); // 使用 debug helper
   }
 }
 
