@@ -208,13 +208,16 @@ export class App {
       const status = siteStatus[bookmarkId];
       
       if (status === false) {
-        // Completely unavailable
+        // 完全无法访问
         item.setAttribute('data-site-status', 'dead');
       } else if (status === 'certificate-error') {
-        // Certificate error but domain exists
+        // 证书错误但域名存在
         item.setAttribute('data-site-status', 'cert-error');
+      } else if (status === 'no-https') {
+        // 只支持 HTTP 访问
+        item.setAttribute('data-site-status', 'no-https');
       } else {
-        // Fully available
+        // 完全可用
         item.removeAttribute('data-site-status');
       }
     });

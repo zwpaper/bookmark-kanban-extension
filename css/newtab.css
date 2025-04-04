@@ -315,12 +315,12 @@ body[data-display-mode="double"] .bookmark-domain {
 main {
   max-width: 100%;
   margin: 1.5rem auto;
-  padding: 0 1.5rem;
+  padding: 0;
   background-color: var(--bg-color);
   min-height: calc(100vh - 80px);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
 }
 
 /* Loading State */
@@ -349,12 +349,13 @@ main {
   display: flex;
   gap: 1.5rem;
   overflow-x: auto;
-  padding: 1rem 1.5rem 2rem;
+  padding: 1rem 0 2rem;
   min-height: calc(100vh - 180px);
   width: 100%;
-  max-width: 1800px;
   margin: 0 auto;
   background-color: var(--bg-color);
+  justify-content: flex-start;
+  padding-left: 30px;
 }
 
 /* Optimized Scrollbar Styles */
@@ -754,72 +755,6 @@ main {
   font-weight: 500;
 }
 
-/* Responsive design */
-@media (min-width: 1601px) {
-  .kanban-board {
-    justify-content: flex-start;
-    margin: 0 auto;
-  }
-  
-  main {
-    padding: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  /* Kanban layout adjustments */
-  .kanban-board {
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0 2rem;
-  }
-  
-  main {
-    padding: 0 1rem;
-  }
-  
-  .kanban-column {
-    flex: 0 0 auto;
-    width: 100%;
-    max-width: 500px;
-    margin-bottom: 1.5rem;
-    max-height: none;
-  }
-  
-  .bookmark-title {
-    max-width: 430px;
-  }
-  
-  /* Header control area adjustments */
-  .header-controls {
-    gap: 0.5rem;
-  }
-  
-  #current-date {
-    display: none;
-  }
-  
-  /* Theme and display mode selector adjustments */
-  .theme-switch,
-  .display-mode-switch {
-    padding: 0.2rem 0.5rem;
-  }
-  
-  .theme-icon,
-  .display-mode-icon {
-    font-size: 1rem;
-  }
-  
-  .theme-selector,
-  .display-mode-selector {
-    font-size: 0.8rem;
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
 /* Website unavailable state styles */
 .bookmark-item[data-site-status="unavailable"] {
   position: relative;
@@ -950,32 +885,6 @@ main {
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
 }
 
-/* Responsive adjustments for selectors */
-@media (max-width: 768px) {
-  .header-controls {
-    gap: 0.5rem;
-  }
-  
-  .theme-switch,
-  .display-mode-switch {
-    padding: 0.2rem 0.5rem;
-  }
-  
-  .theme-icon,
-  .display-mode-icon {
-    font-size: 1rem;
-  }
-  
-  .theme-selector,
-  .display-mode-selector {
-    font-size: 0.8rem;
-    max-width: 90px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
 /* High contrast theme button adjustments */
 [data-theme="high-contrast"] .btn-cancel {
   background-color: #ffffff;
@@ -1045,8 +954,8 @@ main {
 }
 
 /* 所有模式下的死站标识统一使用图标 */
-.bookmark-item[data-site-status="dead"] .bookmark-title::after {
-  content: " ⚠️";
+.bookmark-item[data-site-status="dead"] .bookmark-title::before {
+  content: "🚫 ";  /* 改用禁止图标表示完全无法访问 */
   font-size: 0.8rem;
   color: var(--danger-color);
 }
@@ -1060,7 +969,7 @@ main {
   color: var(--danger-dark);
 }
 
-[data-theme="dark"] .bookmark-item[data-site-status="dead"] .bookmark-title::after {
+[data-theme="dark"] .bookmark-item[data-site-status="dead"] .bookmark-title::before {
   color: var(--danger-dark);
 }
 
@@ -1074,8 +983,66 @@ main {
   color: var(--warning-color);
 }
 
-.bookmark-item[data-site-status="cert-error"] .bookmark-title::after {
-  content: " 🔒";  /* 锁图标表示证书问题 */
+.bookmark-item[data-site-status="cert-error"] .bookmark-title::before {
+  content: "⚠️ ";  /* 警告图标表示证书问题 */
   font-size: 0.8rem;
   color: var(--warning-color);
+}
+
+/* 只支持 HTTP 的站点样式 */
+.bookmark-item[data-site-status="no-https"] {
+  opacity: 0.9;
+  border-left: 3px solid var(--secondary-color);
+}
+
+.bookmark-item[data-site-status="no-https"] .bookmark-title::before {
+  content: "🔓 ";  /* 未锁定图标表示无 HTTPS */
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+/* 鼠标悬停提示 */
+.bookmark-item[data-site-status="dead"]:hover::after {
+  content: "This website is completely inaccessible";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+.bookmark-item[data-site-status="cert-error"]:hover::after {
+  content: "This website has SSL certificate issues";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+.bookmark-item[data-site-status="no-https"]:hover::after {
+  content: "This website only supports HTTP";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
 }
