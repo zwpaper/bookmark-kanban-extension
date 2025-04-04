@@ -165,7 +165,10 @@ Chen Yifeng
 ## Version History
 
 - 1.2.1
-  - Optimized site checking logic for better performance
+  - Fixed layout issues
+    - Optimized kanban board layout with consistent left margin
+    - Removed unnecessary media queries for screen resolution
+    - Improved overall layout stability
 
 - 1.2.0
   - Enhanced bookmark availability checking
