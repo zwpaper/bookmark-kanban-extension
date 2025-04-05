@@ -164,6 +164,16 @@ Chen Yifeng
 
 ## Version History
 
+- 1.2.2
+  - Refactored application architecture
+    - Split app.js into multiple independent modules
+    - Added AppCoordinator.js as application coordinator
+    - Added EventManager.js for event handling
+    - Added MessageHandler.js for message communication
+    - Added SiteCheckManager.js for website checking
+    - Added NotificationManager.js for notifications
+    - Optimized code organization and improved maintainability
+
 - 1.2.1
   - Fixed layout issues
     - Optimized kanban board layout with consistent left margin

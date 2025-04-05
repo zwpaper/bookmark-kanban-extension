@@ -1,5 +1,5 @@
 // js/newtab.js
-import { App } from './app.js';
+import { AppCoordinator } from './AppCoordinator.js';
 import { themeManager } from './modules/themeManager.js';
 import { displayManager } from './modules/displayManager.js';
 
@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Display mode manager initialized, current mode:', displayManager.getCurrentDisplayMode());
     
     // Initialize the application
-    new App();
+    const app = new AppCoordinator();
+    await app.initialize();
   } catch (error) {
     console.error('Initialization failed:', error);
   }

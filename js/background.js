@@ -211,29 +211,31 @@ async function checkAllBookmarks() {
       }
     });
     
-    // Process bookmarks in batches
-    const batchSize = 10;
+    // Process bookmarks in batches with concurrency control
+    const batchSize = 30; // 增加批处理大小
+    const maxConcurrent = 3; // 减少并发数，避免请求过于密集
+    
     for (let i = 0; i < bookmarksToCheck.length; i += batchSize) {
       const batch = bookmarksToCheck.slice(i, i + batchSize);
-      const promises = batch.map(async ({ bookmark, url }) => {
-        try {
-          const isAlive = await siteChecker.checkSite(url.hostname);
-          results.set(bookmark.id, isAlive);
-          // 只在调试模式下输出详细结果
-          if (isDebug) {
-            const status = isAlive === true ? '✅' : 
-                          isAlive === 'certificate-error' ? '⚠️' : 
-                          isAlive === 'no-https' ? '🔓' : '🚫';
-            _debug(`${status} ${url.hostname}`);
-          }
-        } catch (error) {
-          results.set(bookmark.id, false);
-          _debug(`Check failed: ${url.hostname}`);
-        }
-      });
       
-      // Wait for current batch to complete
-      await Promise.all(promises);
+      // 使用 Promise.allSettled 处理并发
+      const batchResults = await Promise.allSettled(
+        batch.map(async ({ bookmark, url }) => {
+          try {
+            const isAlive = await siteChecker.checkSite(url.hostname);
+            results.set(bookmark.id, isAlive);
+            if (isDebug) {
+              const status = isAlive === true ? '✅' : 
+                            isAlive === 'certificate-error' ? '⚠️' : 
+                            isAlive === 'no-https' ? '🔓' : '🚫';
+              _debug(`${status} ${url.hostname}`);
+            }
+          } catch (error) {
+            results.set(bookmark.id, false);
+            _debug(`Check failed: ${url.hostname}`);
+          }
+        })
+      );
       
       // Update progress
       checked += batch.length;
@@ -251,42 +253,43 @@ async function checkAllBookmarks() {
           });
         });
       });
+      
+      // 添加小延迟，避免请求过于密集
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
-
-    // Convert to object format
-    currentSessionResults = Object.fromEntries(results);
     
-    // Use chrome.storage.session if supported
+    // Store results in session storage
     if (chrome.storage.session) {
-      await chrome.storage.session.set({ 'siteStatus': currentSessionResults });
-    } else {
-      // Fallback: use local storage
-      await chrome.storage.local.set({ 'siteStatus': currentSessionResults });
+      try {
+        await chrome.storage.session.set({ siteStatus: Object.fromEntries(results) });
+        currentSessionResults = Object.fromEntries(results);
+      } catch (error) {
+        _debug('Failed to store results in session storage');
+      }
     }
     
-    // Notify all tabs about completion
+    // Send completion message to all tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'CHECK_COMPLETED',
-          siteStatus: currentSessionResults
+          siteStatus: Object.fromEntries(results)
         }).catch(() => {
           // Ignore errors for inactive tabs
         });
       });
     });
     
-    _debug(`=== Bookmark check completed. Checked ${checked} bookmarks ===`);
-    return { success: true, checkedCount: checked };
+    return Object.fromEntries(results);
   } catch (error) {
-    _debug('Bookmark check failed');
+    _debug('Error during bookmark check:', error);
     
-    // Notify all tabs about failure
+    // Send error message to all tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, {
           type: 'CHECK_FAILED',
-          error: 'Check failed'
+          error: error.message
         }).catch(() => {
           // Ignore errors for inactive tabs
         });
