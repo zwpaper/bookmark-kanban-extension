@@ -21,6 +21,9 @@ export class SiteChecker {
     // Maximum cache size
     this.MAX_CACHE_SIZE = 500;
     
+    // Total check timeout for each site (milliseconds)
+    this.TOTAL_CHECK_TIMEOUT = 5000;
+    
     // Initialize periodic cache cleanup
     this.initCacheCleanup();
     
@@ -76,7 +79,7 @@ export class SiteChecker {
   }
 
   /**
-   * Check website status
+   * Check website status with overall timeout
    * @param {string} hostname Hostname
    * @returns {Promise<boolean|string>} Whether website is available or certificate error
    */
@@ -92,11 +95,21 @@ export class SiteChecker {
     }
 
     try {
-      const status = await this.checkAvailability(hostname);
+      // Create a promise that rejects after TOTAL_CHECK_TIMEOUT
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Check timeout')), this.TOTAL_CHECK_TIMEOUT);
+      });
+
+      // Race between the check and the timeout
+      const status = await Promise.race([
+        this.checkAvailability(hostname),
+        timeoutPromise
+      ]);
+
       this.updateCache(hostname, status);
       return status;
     } catch (error) {
-      this._debug(`Site check failed for ${hostname}`); // 简化错误输出
+      this._debug(`Site check failed for ${hostname}: ${error.message}`);
       this.updateCache(hostname, false);
       return false;
     }
