@@ -1033,16 +1033,37 @@ main {
 }
 
 .bookmark-item[data-site-status="no-https"]:hover::after {
-  content: "This website only supports HTTP";
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
-  z-index: 100;
+  content: "This site is not using HTTPS";
+}
+
+.disabled-message,
+.error-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--bg-color);
+}
+
+.disabled-message p,
+.error-message p {
+  margin: 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.disabled-message p:first-child,
+.error-message p:first-child {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+[data-theme="dark"] .disabled-message p,
+[data-theme="dark"] .error-message p {
+  color: var(--text-primary);
 }

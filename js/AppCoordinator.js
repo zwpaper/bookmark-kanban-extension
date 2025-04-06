@@ -1,5 +1,5 @@
 import { BookmarkManager } from './modules/bookmarkManager.js';
-import { UIManager } from './modules/uiManager.js';
+import { UIManager } from './modules/ui/UIManager.js';
 import { ModalManager } from './modules/modalManager.js';
 import { DragManager } from './modules/dragManager.js';
 import { faviconLoader } from './modules/faviconLoader.js';
@@ -74,16 +74,7 @@ export class AppCoordinator {
       this.bookmarkManager.setChangeListener(() => this.handleBookmarksChange());
       this.bookmarkManager.setRemoveListener((id) => {
         // 直接处理 DOM，不触发完整刷新
-        const bookmarkItem = document.querySelector(`[data-bookmark-id="${id}"]`);
-        if (bookmarkItem) {
-          bookmarkItem.style.transition = 'opacity 0.3s ease';
-          bookmarkItem.style.opacity = '0';
-          setTimeout(() => {
-            bookmarkItem.remove();
-            // 删除后更新书签顺序存储
-            this.dragManager.saveBookmarkOrder();
-          }, 300);
-        }
+        this.uiManager.removeBookmarkItem(id);
       });
       
       // 渲染看板

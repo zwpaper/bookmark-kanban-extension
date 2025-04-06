@@ -88,15 +88,17 @@ bookmark-kanban/
 │   ├── newtab.js            # New tab page script
 │   ├── app.js               # Main application controller
 │   └── modules/             # Module directory
-│       ├── uiManager.js     # UI rendering and management
-│       ├── bookmarkManager.js # Bookmark operations
-│       ├── dragManager.js   # Drag and drop functionality
-│       ├── storageManager.js # Layout persistence
-│       ├── modalManager.js  # Modal dialogs
-│       ├── siteChecker.js   # Website availability checking
-│       ├── themeManager.js  # Theme management
-│       ├── commandPalette.js # Command palette functionality
-│       └── utils.js         # Utility functions
+│       ├── ui/              # UI components
+│       │   ├── UIManager.js # Main UI coordinator
+│       │   ├── BookmarkRenderer.js
+│       │   ├── ColumnManager.js
+│       │   ├── KanbanRenderer.js
+│       │   ├── NotificationService.js
+│       │   └── UIStateManager.js
+│       ├── bookmarkManager.js # Bookmark data management
+│       ├── modalManager.js   # Modal dialogs
+│       ├── dragManager.js    # Drag and drop functionality
+│       └── ...
 ├── css/
 │   ├── popup.css
 │   ├── newtab.css
