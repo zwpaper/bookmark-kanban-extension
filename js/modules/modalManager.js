@@ -17,6 +17,8 @@ export class ModalManager {
     this.editModal = this.createEditModal();
     // Create confirm delete modal
     this.confirmModal = this.createConfirmModal();
+    // Create settings modal
+    this.settingsModal = document.getElementById('settingsModal');
     
     // Add to document
     document.body.appendChild(this.editModal);
@@ -231,6 +233,98 @@ export class ModalManager {
     
     // Show modal
     this.showModal(modal);
+  }
+
+  /**
+   * Show settings modal
+   */
+  showSettingsModal() {
+    const modal = this.settingsModal;
+    
+    // Ensure current settings are reflected
+    if (window.app) {
+      // Theme selector
+      const themeSelector = modal.querySelector('#theme-selector');
+      if (themeSelector && window.app.themeManager) {
+        themeSelector.value = window.app.themeManager.getCurrentTheme();
+      }
+      
+      // Display mode selector
+      const displayModeSelector = modal.querySelector('#display-mode-selector');
+      if (displayModeSelector && window.app.displayManager) {
+        displayModeSelector.value = window.app.displayManager.getCurrentDisplayMode();
+      }
+    }
+    
+    // Bind events if not already bound
+    this.bindSettingsEvents(modal);
+    
+    // Show modal
+    this.showModal(modal);
+  }
+  
+  /**
+   * Bind settings modal events
+   * @param {HTMLElement} modal Settings modal element
+   */
+  bindSettingsEvents(modal) {
+    // Theme selector
+    const themeSelector = modal.querySelector('#theme-selector');
+    if (themeSelector && !themeSelector.dataset.bound) {
+      themeSelector.addEventListener('change', (e) => {
+        if (window.app && window.app.themeManager) {
+          window.app.themeManager.switchTheme(e.target.value);
+        }
+      });
+      themeSelector.dataset.bound = 'true';
+    }
+    
+    // Display mode selector
+    const displayModeSelector = modal.querySelector('#display-mode-selector');
+    if (displayModeSelector && !displayModeSelector.dataset.bound) {
+      displayModeSelector.addEventListener('change', (e) => {
+        if (window.app && window.app.displayManager) {
+          window.app.displayManager.switchDisplayMode(e.target.value);
+        }
+      });
+      displayModeSelector.dataset.bound = 'true';
+    }
+    
+    // Refresh bookmarks button
+    const refreshButton = modal.querySelector('#refresh-bookmarks');
+    if (refreshButton && !refreshButton.dataset.bound) {
+      refreshButton.addEventListener('click', () => {
+        if (window.app && window.app.bookmarkManager) {
+          this.closeActiveModal();
+          window.app.bookmarkManager.refreshBookmarkTree();
+          this.showToast('Bookmarks refreshed');
+        }
+      });
+      refreshButton.dataset.bound = 'true';
+    }
+    
+    // Reset layout button
+    const resetButton = modal.querySelector('#reset-layout');
+    if (resetButton && !resetButton.dataset.bound) {
+      resetButton.addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset the board layout? This will restore the default order of columns and bookmarks.')) {
+          if (window.app) {
+            this.closeActiveModal();
+            window.app.resetLayout();
+          }
+        }
+      });
+      resetButton.dataset.bound = 'true';
+    }
+    
+    // Close button
+    const closeButton = modal.querySelector('#closeSettings');
+    if (closeButton && !closeButton.dataset.bound) {
+      closeButton.addEventListener('click', () => {
+        this.closeActiveModal();
+      });
+      closeButton.dataset.bound = 'true';
+    }
   }
 
   /**

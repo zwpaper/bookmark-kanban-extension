@@ -25,6 +25,14 @@ export class EventManager {
         return;
       }
       
+      // 处理设置按钮点击
+      if (target.closest('#settings-button')) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.app.modalManager.showSettingsModal();
+        return;
+      }
+      
       // 处理编辑按钮点击
       if (target.closest('.edit-btn')) {
         e.preventDefault();
@@ -65,8 +73,12 @@ export class EventManager {
   async handleEditClick(bookmarkItem) {
     const bookmarkId = bookmarkItem.dataset.bookmarkId;
     try {
-      const [bookmark] = await chrome.bookmarks.get(bookmarkId);
-      this.app.modalManager.showEditModal(bookmark);
+      if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+        const [bookmark] = await chrome.bookmarks.get(bookmarkId);
+        this.app.modalManager.showEditModal(bookmark);
+      } else {
+        console.error('Chrome bookmarks API is not available');
+      }
     } catch (error) {
       console.error('Failed to get bookmark:', error);
     }
@@ -75,11 +87,17 @@ export class EventManager {
   async handleDeleteClick(bookmarkItem) {
     const bookmarkId = bookmarkItem.dataset.bookmarkId;
     try {
-      const [bookmark] = await chrome.bookmarks.get(bookmarkId);
-      this.app.modalManager.showConfirmModal(bookmark);
+      if (typeof chrome !== 'undefined' && chrome.bookmarks) {
+        const [bookmark] = await chrome.bookmarks.get(bookmarkId);
+        this.app.modalManager.showConfirmModal(bookmark);
+      } else {
+        console.error('Chrome bookmarks API is not available');
+      }
     } catch (error) {
       console.error('Failed to get bookmark:', error);
-      this.app.notificationManager.showErrorToast('Failed to retrieve bookmark information');
+      if (this.app.notificationManager) {
+        this.app.notificationManager.showErrorToast('Failed to retrieve bookmark information');
+      }
     }
   }
   
@@ -87,7 +105,9 @@ export class EventManager {
     if (this.app.dragManager) {
       this.app.dragManager.saveColumnOrder();
       this.app.dragManager.saveBookmarkOrder();
-      this.app.notificationManager.showToast('Layout saved successfully');
+      if (this.app.notificationManager) {
+        this.app.notificationManager.showToast('Layout saved successfully');
+      }
     }
   }
 } 

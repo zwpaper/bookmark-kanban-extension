@@ -166,6 +166,13 @@ Chen Yifeng
 
 ## Version History
 
+- 1.2.3
+  - Moved theme and display mode selectors to settings page
+    - Added settings button with gear icon
+    - Created settings modal dialog
+    - Improved UI layout and responsiveness
+    - Removed keyboard shortcut for settings to avoid conflicts
+
 - 1.2.2
   - Refactored application architecture
     - Split app.js into multiple independent modules

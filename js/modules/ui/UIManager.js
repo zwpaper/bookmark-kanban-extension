@@ -4,7 +4,6 @@ import { ColumnManager } from './ColumnManager.js';
 import { KanbanRenderer } from './KanbanRenderer.js';
 import { NotificationService } from './NotificationService.js';
 import { UIStateManager } from './UIStateManager.js';
-import { themeManager } from '../themeManager.js';
 
 export class UIManager {
   constructor(bookmarkManager) {
@@ -29,7 +28,6 @@ export class UIManager {
     
     // Initialize UI components
     this.initializeTimeUpdate();
-    this.initializeThemeSelector();
   }
 
   /**
@@ -44,41 +42,6 @@ export class UIManager {
 
     updateDateTime();
     setInterval(updateDateTime, 1000);
-  }
-
-  /**
-   * Initialize theme selector
-   */
-  initializeThemeSelector() {
-    const themeSelector = document.getElementById('theme-selector');
-    if (!themeSelector) return;
-    
-    // Set current theme
-    themeSelector.value = themeManager.getCurrentTheme();
-    
-    // Add change event listener
-    themeSelector.addEventListener('change', (e) => {
-      const newTheme = e.target.value;
-      this.handleThemeChange(newTheme);
-    });
-  }
-
-  /**
-   * Handle theme change
-   * @param {string} theme Theme name
-   */
-  async handleThemeChange(theme) {
-    try {
-      const success = await themeManager.switchTheme(theme);
-      if (success) {
-        this.notificationService.showToast('Theme updated successfully', 'success');
-      } else {
-        this.notificationService.showToast('Theme update failed', 'error');
-      }
-    } catch (error) {
-      console.error('Theme switch failed:', error);
-      this.notificationService.showToast('Theme update failed', 'error');
-    }
   }
 
   /**
