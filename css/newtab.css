@@ -190,7 +190,7 @@ header {
   .check-text {
     display: none;
   }
-  
+
   .header-button {
     padding: 0.3rem;
   }
@@ -1203,12 +1203,25 @@ main {
   .settings-text {
     display: none;
   }
-  
+
   #settings-button {
     padding: 0.3rem;
   }
-  
+
   .settings-content {
     max-width: 90%;
   }
+}
+
+.bookmark-tags {
+  margin-top: 4px;
+}
+
+.bookmark-tag {
+  font-size: 11px;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+  display: inline-block;
 }

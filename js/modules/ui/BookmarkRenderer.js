@@ -1,4 +1,4 @@
-import { createElement, getDomain } from '../utils.js';
+import { createElement, getDomain, parseTitle, getTagColor } from '../utils.js';
 import { faviconLoader } from '../faviconLoader.js';
 
 export class BookmarkRenderer {
@@ -6,7 +6,7 @@ export class BookmarkRenderer {
     // Callbacks from outer components
     this.onBookmarkOrderChanged = null;
   }
-  
+
   /**
    * Set callback for when bookmark order changes
    * @param {Function} callback Callback function
@@ -24,27 +24,39 @@ export class BookmarkRenderer {
     const item = createElement('div', 'bookmark-item');
     item.setAttribute('data-bookmark-id', bookmark.id);
     item.setAttribute('draggable', 'true');
-    
+
     // Add URL as data attribute for single-line mode tooltip
     item.setAttribute('data-url', bookmark.url);
-    
+
     const content = createElement('div', 'bookmark-content');
-    
+
     // Create favicon container
     const faviconContainer = createElement('div', 'bookmark-favicon');
-    
+
     // Create title element
     const title = createElement('div', 'bookmark-title');
-    title.textContent = bookmark.title || '(Untitled)';
-    title.title = bookmark.title || bookmark.url;
-    
+    const { cleanTitle, tags } = parseTitle(bookmark.title);
+    title.textContent = cleanTitle || '(Untitled)';
+    title.title = cleanTitle || bookmark.url;
+
+    // Create tags container
+    const tagsContainer = createElement('div', 'bookmark-tags');
+    if (tags.length > 0) {
+      tags.forEach(tag => {
+        const tagElement = createElement('span', 'bookmark-tag');
+        tagElement.textContent = tag.substring(1); // Remove #
+        tagElement.style.backgroundColor = getTagColor(tag);
+        tagsContainer.appendChild(tagElement);
+      });
+    }
+
     // Create domain element
     const domain = createElement('div', 'bookmark-domain');
     domain.textContent = getDomain(bookmark.url);
-    
+
     // Create actions container
     const actions = createElement('div', 'bookmark-actions');
-    
+
     // Create edit button
     const editButton = createElement('button', 'bookmark-action edit-btn');
     editButton.innerHTML = `
@@ -53,7 +65,7 @@ export class BookmarkRenderer {
       </svg>
     `;
     editButton.title = 'Edit';
-    
+
     // Create delete button
     const deleteButton = createElement('button', 'bookmark-action delete-btn');
     deleteButton.innerHTML = `
@@ -62,33 +74,36 @@ export class BookmarkRenderer {
       </svg>
     `;
     deleteButton.title = 'Delete';
-    
+
     // Assemble actions
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
-    
+
     // Assemble content
     content.appendChild(faviconContainer);
     content.appendChild(title);
+    if (tags.length > 0) {
+      content.appendChild(tagsContainer);
+    }
     content.appendChild(domain);
-    
+
     // Assemble item
     item.appendChild(content);
     item.appendChild(actions);
-    
+
     // Add click handler to open bookmark
     item.addEventListener('click', (e) => {
       if (!e.target.closest('.bookmark-action')) {
         window.open(bookmark.url, '_blank');
       }
     });
-    
+
     // Load favicon
     faviconLoader.prepareIconElement(faviconContainer, bookmark.url);
-    
+
     return item;
   }
-  
+
   /**
    * Update specific bookmark display
    * @param {Object} bookmark Bookmark data
@@ -96,15 +111,11 @@ export class BookmarkRenderer {
   updateBookmarkItem(bookmark) {
     const item = document.querySelector(`.bookmark-item[data-bookmark-id="${bookmark.id}"]`);
     if (item) {
-      const title = item.querySelector('.bookmark-title');
-      const favicon = item.querySelector('.bookmark-favicon');
-      
-      title.textContent = bookmark.title || getDomain(bookmark.url);
-      faviconLoader.prepareIconElement(favicon, bookmark.url);
-      item.dataset.url = bookmark.url;
+      const newItem = this.createBookmarkItem(bookmark);
+      item.replaceWith(newItem);
     }
   }
-  
+
   /**
    * Remove single bookmark element
    * @param {string} bookmarkId Bookmark ID to remove
@@ -114,22 +125,22 @@ export class BookmarkRenderer {
     if (bookmarkItem) {
       bookmarkItem.style.transition = 'opacity 0.3s ease';
       bookmarkItem.style.opacity = '0';
-      
+
       setTimeout(() => {
         bookmarkItem.remove();
-        
+
         const column = bookmarkItem.closest('.kanban-column');
         if (column) {
           const count = column.querySelector('.column-count');
           const currentCount = parseInt(count.textContent) - 1;
           count.textContent = currentCount;
-          
+
           const bookmarkList = column.querySelector('.bookmark-list');
           if (bookmarkList && bookmarkList.children.length === 0) {
             bookmarkList.innerHTML = '<div class="empty-column">No bookmarks</div>';
           }
         }
-        
+
         // Notify about order change
         if (this.onBookmarkOrderChanged) {
           this.onBookmarkOrderChanged();
@@ -137,7 +148,7 @@ export class BookmarkRenderer {
       }, 300);
     }
   }
-  
+
   /**
    * Create empty folder message
    * @returns {HTMLElement} Message element
@@ -147,4 +158,4 @@ export class BookmarkRenderer {
     empty.textContent = 'This folder is empty';
     return empty;
   }
-} 
+}

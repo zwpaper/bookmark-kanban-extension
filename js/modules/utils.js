@@ -35,7 +35,7 @@ export const formatDateTime = (date) => {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   const seconds = String(date.getSeconds()).padStart(2, '0');
-  
+
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -67,4 +67,37 @@ export const getDomain = (url) => {
   } catch (e) {
     return url;
   }
+};
+
+/**
+ * Parse title to extract tags
+ * @param {string} title Bookmark title
+ * @returns {{cleanTitle: string, tags: string[]}} Cleaned title and tags
+ */
+export const parseTitle = (title) => {
+  if (!title) {
+    return { cleanTitle: '', tags: [] };
+  }
+  const tagRegex = /#\w+/g;
+  const tags = title.match(tagRegex) || [];
+  const cleanTitle = title.replace(tagRegex, '').trim();
+  return { cleanTitle, tags };
+};
+
+/**
+ * Get a consistent color for a tag
+ * @param {string} tag The tag string
+ * @returns {string} HSL color string
+ */
+export const getTagColor = (tag) => {
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = (hash * 137.5) % 360;
+  const saturation = 60 + (hash % 21);
+  const lightness = 45 + (hash % 11);
+
+  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 };
