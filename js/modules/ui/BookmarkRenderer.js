@@ -5,6 +5,7 @@ export class BookmarkRenderer {
   constructor() {
     // Callbacks from outer components
     this.onBookmarkOrderChanged = null;
+    this.openInNewTab = true;
   }
 
   /**
@@ -13,6 +14,14 @@ export class BookmarkRenderer {
    */
   setOrderChangedCallback(callback) {
     this.onBookmarkOrderChanged = callback;
+  }
+
+  /**
+   * Set the open in new tab preference
+   * @param {boolean} openInNewTab True to open in new tab, false for current tab
+   */
+  setOpenInNewTab(openInNewTab) {
+    this.openInNewTab = openInNewTab;
   }
 
   /**
@@ -94,7 +103,7 @@ export class BookmarkRenderer {
     // Add click handler to open bookmark
     item.addEventListener('click', (e) => {
       if (!e.target.closest('.bookmark-action')) {
-        window.open(bookmark.url, '_blank');
+        window.open(bookmark.url, this.openInNewTab ? '_blank' : '_self');
       }
     });
 

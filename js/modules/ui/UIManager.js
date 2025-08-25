@@ -102,9 +102,17 @@ export class UIManager {
   }
 
   /**
+   * Set the open in new tab preference
+   * @param {boolean} openInNewTab True to open in new tab, false for current tab
+   */
+  setOpenInNewTab(openInNewTab) {
+    this.bookmarkRenderer.setOpenInNewTab(openInNewTab);
+  }
+
+  /**
    * Show drag guide for new users
    */
   showDragGuide() {
     this.uiStateManager.showDragGuide();
   }
-} 
+}

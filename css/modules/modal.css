@@ -67,6 +67,24 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+.form-group.form-group-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-group.form-group-inline label {
+  /* Override display: block */
+  display: inline-block;
+  margin-bottom: 0;
+}
+
+.form-group.form-group-inline input[type="checkbox"] {
+  /* Override width: 100% */
+  width: auto;
+  margin-left: var(--spacing-md);
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -173,4 +191,4 @@
   .modal-content {
     margin: var(--spacing-md);
   }
-} 
+}

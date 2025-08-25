@@ -17,7 +17,7 @@ export class AppCoordinator {
     this._isDeleteOperation = false;
     this.faviconObserver = null;
     this.siteStatus = new Map();
-    
+
     // 使 app 实例全局可访问
     window.app = this;
   }
@@ -27,39 +27,39 @@ export class AppCoordinator {
       // 初始化主题管理器
       this.themeManager = themeManager;
       await this.themeManager.initializeTheme();
-      
+
       // 初始化显示模式管理器
       this.displayManager = displayManager;
       await this.displayManager.initializeDisplayMode();
-      
+
       // 初始化书签管理器
       this.bookmarkManager = new BookmarkManager();
-      
+
       // 初始化 UI 管理器
       this.uiManager = new UIManager(this.bookmarkManager);
-      
+
       // 初始化模态框管理器
       this.modalManager = new ModalManager(this.bookmarkManager, this.uiManager);
-      
+
       // 初始化拖拽管理器
       this.dragManager = new DragManager(this.bookmarkManager, this.uiManager);
-      
+
       // 初始化命令面板
       this.commandPalette = new CommandPalette(this.bookmarkManager);
       await this.commandPalette.initialize();
-      
+
       // 初始化事件管理器
       this.eventManager = new EventManager(this);
-      
+
       // 初始化消息处理器
       this.messageHandler = new MessageHandler(this);
-      
+
       // 初始化站点检查管理器
       this.siteCheckManager = new SiteCheckManager(this);
-      
+
       // 初始化通知管理器
       this.notificationManager = new NotificationManager();
-      
+
       // 检查是否启用新标签页
       const enabled = await this.checkNewTabEnabled();
       if (!enabled) {
@@ -69,17 +69,17 @@ export class AppCoordinator {
 
       // 显示加载状态
       this.uiManager.showLoading();
-      
+
       // 设置书签变更监听器
       this.bookmarkManager.setChangeListener(() => this.handleBookmarksChange());
       this.bookmarkManager.setRemoveListener((id) => {
         // 直接处理 DOM，不触发完整刷新
         this.uiManager.removeBookmarkItem(id);
       });
-      
+
       // 渲染看板
       await this.uiManager.renderKanban();
-      
+
       // 初始化拖拽功能
       this.dragManager.initialize();
 
@@ -108,7 +108,7 @@ export class AppCoordinator {
       this.faviconObserver.disconnect();
       this.faviconObserver = null;
     }
-    
+
     // 使用新的图标加载器
     faviconLoader.initialize();
   }
@@ -117,34 +117,34 @@ export class AppCoordinator {
     if (this._bookmarkChangeTimer) {
       clearTimeout(this._bookmarkChangeTimer);
     }
-    
+
     this._bookmarkChangeTimer = setTimeout(async () => {
       try {
         // 如果正在拖拽，不更新
         if (this.dragManager && this.dragManager.isDragging) {
           return;
         }
-        
+
         console.log('Processing bookmark changes, re-rendering board');
-        
+
         // 保存当前滚动位置
         const scrollPosition = window.scrollY;
-        
+
         // 在重新渲染前销毁拖拽实例
         if (this.dragManager) {
           this.dragManager.destroy();
         }
-        
+
         // 重新渲染
         await this.uiManager.renderKanban();
-        
+
         // 重新初始化拖拽
         if (this.dragManager) {
           this.dragManager.initialize();
         }
 
         this.initializeFaviconLoading();
-        
+
         // 保存新布局
         this.dragManager.saveColumnOrder();
         this.dragManager.saveBookmarkOrder();
@@ -156,7 +156,7 @@ export class AppCoordinator {
             window.scrollTo(0, scrollPosition);
           });
         }, 100);
-        
+
       } catch (error) {
         console.error('Error processing bookmark changes:', error);
       }
@@ -191,4 +191,8 @@ export class AppCoordinator {
       return false;
     }
   }
-} 
+
+  setOpenInNewTab(openInNewTab) {
+    this.uiManager.setOpenInNewTab(openInNewTab);
+  }
+}

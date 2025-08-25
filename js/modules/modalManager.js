@@ -19,11 +19,11 @@ export class ModalManager {
     this.confirmModal = this.createConfirmModal();
     // Create settings modal
     this.settingsModal = document.getElementById('settingsModal');
-    
+
     // Add to document
     document.body.appendChild(this.editModal);
     document.body.appendChild(this.confirmModal);
-    
+
     // Bind global click event for closing modals
     document.addEventListener('click', (e) => {
       // Only close when clicking the modal background
@@ -47,7 +47,7 @@ export class ModalManager {
   createEditModal() {
     const modal = createElement('div', 'modal');
     modal.id = 'editModal';
-    
+
     modal.innerHTML = `
       <div class="modal-content">
         <h2>Edit Bookmark</h2>
@@ -71,7 +71,7 @@ export class ModalManager {
     // Add keyboard event handling
     const titleInput = modal.querySelector('#bookmarkTitle');
     const urlInput = modal.querySelector('#bookmarkUrl');
-    
+
     // Prevent backspace key from triggering history navigation in input fields
     [titleInput, urlInput].forEach(input => {
       input.addEventListener('keydown', (e) => {
@@ -91,7 +91,7 @@ export class ModalManager {
   createConfirmModal() {
     const modal = createElement('div', 'modal');
     modal.id = 'confirmModal';
-    
+
     modal.innerHTML = `
       <div class="modal-content confirm-content">
         <h2>Delete Bookmark</h2>
@@ -115,11 +115,11 @@ export class ModalManager {
     const form = modal.querySelector('#editBookmarkForm');
     const titleInput = modal.querySelector('#bookmarkTitle');
     const urlInput = modal.querySelector('#bookmarkUrl');
-    
+
     // Fill current values
     titleInput.value = bookmark.title;
     urlInput.value = bookmark.url;
-    
+
     // Bind form submit event
     form.onsubmit = async (e) => {
       e.preventDefault();
@@ -128,10 +128,10 @@ export class ModalManager {
         url: urlInput.value
       });
     };
-    
+
     // Bind cancel button
     modal.querySelector('.btn-cancel').onclick = () => this.closeActiveModal();
-    
+
     this.showModal(modal);
     titleInput.focus();
   }
@@ -142,56 +142,56 @@ export class ModalManager {
    */
   showConfirmModal(bookmark) {
     const modal = this.confirmModal;
-    
+
     // Set confirmation message
     const titleSpan = modal.querySelector('#deleteBookmarkTitle');
     titleSpan.textContent = bookmark.title;
-    
+
     // Get button elements
     const confirmBtn = modal.querySelector('.btn-delete');
     const cancelBtn = modal.querySelector('.btn-cancel');
-    
+
     // Remove existing event listeners
     const newConfirmBtn = confirmBtn.cloneNode(true);
     const newCancelBtn = cancelBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
     cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-    
+
     // Bind new delete event
     newConfirmBtn.addEventListener('click', async () => {
       try {
         newConfirmBtn.disabled = true;
         newConfirmBtn.textContent = 'Deleting...';
-        
+
         // Save current scroll position
         const scrollPosition = window.scrollY;
         console.log("Delete before scroll position:", scrollPosition);
-        
+
         // Execute delete operation
         await this.bookmarkManager.deleteBookmark(bookmark.id);
-        
+
         // Close modal
         this.closeActiveModal();
-        
+
         // Show success message
         this.showToast('Bookmark deleted');
-        
+
         // Important: Stop possible global refresh
         // Use direct DOM manipulation instead of triggering a full refresh
         const bookmarkItem = document.querySelector(`[data-bookmark-id="${bookmark.id}"]`);
         if (bookmarkItem) {
           bookmarkItem.style.transition = 'opacity 0.3s ease';
           bookmarkItem.style.opacity = '0';
-          
+
           setTimeout(() => {
             // Remove element after fade out
             bookmarkItem.remove();
-            
+
             // Update bookmark order storage
             if (window.app && window.app.dragManager) {
               window.app.dragManager.saveBookmarkOrder();
             }
-            
+
             // More reliably restore scroll position - use multiple attempts to ensure success
             // Try immediately once
             // Then try a few more times to ensure success
@@ -200,21 +200,21 @@ export class ModalManager {
               console.log("Try to restore scroll position:", scrollPosition);
               window.scrollTo(0, scrollPosition);
             };
-            
+
             // Immediately try once
             restoreScroll();
-            
+
             // Then try a few more times to ensure success
             setTimeout(restoreScroll, 50);
             setTimeout(restoreScroll, 150);
-            
+
             // Finally use requestAnimationFrame to ensure restoration after rendering
             setTimeout(() => {
               requestAnimationFrame(restoreScroll);
             }, 300);
           }, 300);
         }
-        
+
       } catch (error) {
         console.error('Failed to delete bookmark:', error);
         this.showToast('Failed to delete bookmark: ' + (error.message || 'Unknown error'), 'error');
@@ -225,12 +225,12 @@ export class ModalManager {
         }
       }
     });
-    
+
     // Bind cancel event
     newCancelBtn.addEventListener('click', () => {
       this.closeActiveModal();
     });
-    
+
     // Show modal
     this.showModal(modal);
   }
@@ -240,7 +240,7 @@ export class ModalManager {
    */
   showSettingsModal() {
     const modal = this.settingsModal;
-    
+
     // Ensure current settings are reflected
     if (window.app) {
       // Theme selector
@@ -248,21 +248,29 @@ export class ModalManager {
       if (themeSelector && window.app.themeManager) {
         themeSelector.value = window.app.themeManager.getCurrentTheme();
       }
-      
+
       // Display mode selector
       const displayModeSelector = modal.querySelector('#display-mode-selector');
       if (displayModeSelector && window.app.displayManager) {
         displayModeSelector.value = window.app.displayManager.getCurrentDisplayMode();
       }
+
+      // Open in new tab toggle
+      const openInNewTabToggle = modal.querySelector('#open-in-new-tab-toggle');
+      if (openInNewTabToggle) {
+        chrome.storage.sync.get(['openInNewTab'], result => {
+          openInNewTabToggle.checked = result.openInNewTab !== false;
+        });
+      }
     }
-    
+
     // Bind events if not already bound
     this.bindSettingsEvents(modal);
-    
+
     // Show modal
     this.showModal(modal);
   }
-  
+
   /**
    * Bind settings modal events
    * @param {HTMLElement} modal Settings modal element
@@ -278,7 +286,7 @@ export class ModalManager {
       });
       themeSelector.dataset.bound = 'true';
     }
-    
+
     // Display mode selector
     const displayModeSelector = modal.querySelector('#display-mode-selector');
     if (displayModeSelector && !displayModeSelector.dataset.bound) {
@@ -289,7 +297,22 @@ export class ModalManager {
       });
       displayModeSelector.dataset.bound = 'true';
     }
-    
+
+    // Open in new tab toggle
+    const openInNewTabToggle = modal.querySelector('#open-in-new-tab-toggle');
+    if (openInNewTabToggle && !openInNewTabToggle.dataset.bound) {
+      openInNewTabToggle.addEventListener('change', (e) => {
+        const openInNewTab = e.target.checked;
+        chrome.storage.sync.set({ openInNewTab }, () => {
+          if (window.app) {
+            window.app.setOpenInNewTab(openInNewTab);
+          }
+          this.showToast('Setting updated');
+        });
+      });
+      openInNewTabToggle.dataset.bound = 'true';
+    }
+
     // Refresh bookmarks button
     const refreshButton = modal.querySelector('#refresh-bookmarks');
     if (refreshButton && !refreshButton.dataset.bound) {
@@ -302,7 +325,7 @@ export class ModalManager {
       });
       refreshButton.dataset.bound = 'true';
     }
-    
+
     // Reset layout button
     const resetButton = modal.querySelector('#reset-layout');
     if (resetButton && !resetButton.dataset.bound) {
@@ -316,7 +339,7 @@ export class ModalManager {
       });
       resetButton.dataset.bound = 'true';
     }
-    
+
     // Close button
     const closeButton = modal.querySelector('#closeSettings');
     if (closeButton && !closeButton.dataset.bound) {
@@ -348,15 +371,15 @@ export class ModalManager {
     toast.style.zIndex = '9999';
     toast.style.opacity = '0';
     toast.style.transition = 'opacity 0.3s ease';
-    
+
     // Add to document
     document.body.appendChild(toast);
-    
+
     // Show animation
     setTimeout(() => {
       toast.style.opacity = '1';
     }, 10);
-    
+
     // Auto dismiss
     setTimeout(() => {
       toast.style.opacity = '0';
@@ -408,7 +431,7 @@ export class ModalManager {
             button.textContent = 'Delete';
           }
         });
-        
+
         this.activeModal.classList.remove('show');
         document.body.style.overflow = '';
         this.activeModal = null;
@@ -426,4 +449,4 @@ export class ModalManager {
     // Can implement better error UI as needed
     alert(message);
   }
-} 
+}
