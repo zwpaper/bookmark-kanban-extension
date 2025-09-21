@@ -13,6 +13,35 @@ class PopupManager {
   }
 
   /**
+   * Setup event listeners
+   */
+  setupEventListeners() {
+    document.getElementById('show-on-newtab').addEventListener('change', (event) => {
+      this.saveSettings(event.target.checked);
+    });
+
+    document.getElementById('theme-selector').addEventListener('change', (event) => {
+      this.handleThemeChange(event.target.value);
+    });
+
+    document.getElementById('display-mode-selector').addEventListener('change', (event) => {
+      this.handleDisplayModeChange(event.target.value);
+    });
+
+    document.getElementById('refresh-bookmarks').addEventListener('click', () => {
+      this.handleRefresh();
+    });
+
+    document.getElementById('reset-layout').addEventListener('click', () => {
+      this.handleResetLayout();
+    });
+
+    document.getElementById('refresh-favicons').addEventListener('click', () => {
+      this.handleRefreshFavicons();
+    });
+  }
+
+  /**
    * Load settings
    */
   loadSettings() {
@@ -20,10 +49,10 @@ class PopupManager {
       const checkbox = document.getElementById('show-on-newtab');
       checkbox.checked = result.showOnNewTab !== false;
     });
-    
+
     const themeSelector = document.getElementById('theme-selector');
     themeSelector.value = themeManager.getCurrentTheme();
-    
+
     document.documentElement.setAttribute('data-theme', themeManager.getCurrentTheme());
 
     // Load display mode settings
@@ -49,12 +78,12 @@ class PopupManager {
   async handleThemeChange(theme) {
     try {
       document.documentElement.setAttribute('data-theme', theme === 'default' ? '' : theme);
-      
+
       const success = await themeManager.switchTheme(theme);
-      
+
       if (success) {
         this.showToast('Theme updated');
-        
+
         const tabs = await chrome.tabs.query({ url: 'chrome://newtab/*' });
         tabs.forEach(tab => {
           chrome.tabs.sendMessage(tab.id, { type: 'THEME_CHANGED', theme }).catch(() => {
@@ -77,9 +106,9 @@ class PopupManager {
   async handleDisplayModeChange(mode) {
     try {
       await chrome.storage.sync.set({ 'bookmark_board_display_mode': mode });
-      
+
       this.showToast('Display mode updated');
-      
+
       const tabs = await chrome.tabs.query({ url: 'chrome://newtab/*' });
       tabs.forEach(tab => {
         chrome.tabs.sendMessage(tab.id, { type: 'DISPLAY_MODE_CHANGED', mode }).catch(() => {
@@ -112,7 +141,7 @@ class PopupManager {
     try {
       const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
       const currentTab = tabs[0];
-      
+
       if (currentTab.url.startsWith('chrome://newtab')) {
         await chrome.tabs.reload(currentTab.id);
         window.close();
@@ -126,6 +155,24 @@ class PopupManager {
   }
 
   /**
+   * Handle refresh favicons operation
+   */
+  async handleRefreshFavicons() {
+    try {
+      const tabs = await chrome.tabs.query({ url: 'chrome://newtab/*' });
+      tabs.forEach(tab => {
+        chrome.tabs.sendMessage(tab.id, { type: 'REFRESH_FAVICONS' }).catch(() => {
+          // Ignore tabs that cannot communicate
+        });
+      });
+      this.showToast('Favicon refresh started');
+    } catch (error) {
+      console.error('Failed to refresh favicons:', error);
+      this.showToast('Failed to refresh favicons', 'error');
+    }
+  }
+
+  /**
    * Handle reset layout operation
    */
   async handleResetLayout() {
@@ -134,17 +181,17 @@ class PopupManager {
       if (confirm('Are you sure you want to reset the board layout? This will restore the default order of columns and bookmarks.')) {
         // Clear all layout data
         storageManager.clearAllOrderData();
-        
+
         // Refresh current tab
         const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
         const currentTab = tabs[0];
-        
+
         if (currentTab.url.startsWith('chrome://newtab')) {
           await chrome.tabs.reload(currentTab.id);
         }
-        
+
         this.showToast('Layout has been reset');
-        
+
         // Close popup window
         setTimeout(() => window.close(), 1500);
       }
@@ -189,9 +236,9 @@ class PopupManager {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.textContent = message;
-    
+
     document.body.appendChild(toast);
-    
+
     // Auto dismiss
     setTimeout(() => {
       toast.classList.add('fade-out');

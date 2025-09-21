@@ -39,8 +39,12 @@ export class BookmarkRenderer {
 
     const content = createElement('div', 'bookmark-content');
 
-    // Create favicon container
-    const faviconContainer = createElement('div', 'bookmark-favicon');
+    // Create favicon element
+    const favicon = createElement('img', 'bookmark-icon');
+    favicon.setAttribute('data-hostname', getDomain(bookmark.url));
+    faviconLoader.loadIcon(favicon, getDomain(bookmark.url));
+
+    const textContainer = createElement('div', 'bookmark-text-container');
 
     // Create title element
     const title = createElement('div', 'bookmark-title');
@@ -62,6 +66,17 @@ export class BookmarkRenderer {
     // Create domain element
     const domain = createElement('div', 'bookmark-domain');
     domain.textContent = getDomain(bookmark.url);
+
+    // Assemble text container
+    textContainer.appendChild(title);
+    if (tags.length > 0) {
+      textContainer.appendChild(tagsContainer);
+    }
+    textContainer.appendChild(domain);
+
+    // Assemble content
+    content.appendChild(favicon);
+    content.appendChild(textContainer);
 
     // Create actions container
     const actions = createElement('div', 'bookmark-actions');
@@ -88,14 +103,6 @@ export class BookmarkRenderer {
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
 
-    // Assemble content
-    content.appendChild(faviconContainer);
-    content.appendChild(title);
-    if (tags.length > 0) {
-      content.appendChild(tagsContainer);
-    }
-    content.appendChild(domain);
-
     // Assemble item
     item.appendChild(content);
     item.appendChild(actions);
@@ -106,9 +113,6 @@ export class BookmarkRenderer {
         window.open(bookmark.url, this.openInNewTab ? '_blank' : '_self');
       }
     });
-
-    // Load favicon
-    faviconLoader.prepareIconElement(faviconContainer, bookmark.url);
 
     return item;
   }
@@ -168,3 +172,4 @@ export class BookmarkRenderer {
     return empty;
   }
 }
+

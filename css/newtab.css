@@ -511,6 +511,14 @@ main {
   border-color: var(--primary-light);
 }
 
+.bookmark-content {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
 .bookmark-icon {
   width: 16px;
   height: 16px;
@@ -523,8 +531,6 @@ main {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-right: 28px;
-  max-width: 320px;
   color: var(--text-primary);
   transition: color 0.3s;
 }

@@ -1,7 +1,7 @@
 // js/modules/faviconLoader.js
 /**
  * Website Icon Loader
- * 
+ *
  * Handles lazy loading, caching, and error handling of website icons
  */
 import { siteChecker } from './siteChecker.js';
@@ -23,7 +23,7 @@ export class FaviconLoader {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const iconElement = entry.target;
-          
+
           if (iconElement.dataset.loaded !== 'true' && iconElement.dataset.hostname) {
             this.loadIcon(iconElement, iconElement.dataset.hostname);
           } else {
@@ -139,7 +139,7 @@ export class FaviconLoader {
   updateIconStatus(element, isAvailable, iconUrl) {
     element.src = iconUrl;
     element.dataset.loaded = 'true';
-    
+
     const bookmarkItem = element.closest('.bookmark-item');
     if (bookmarkItem) {
       bookmarkItem.dataset.siteStatus = isAvailable ? 'available' : 'unavailable';
@@ -147,7 +147,7 @@ export class FaviconLoader {
         bookmarkItem.title = 'This website may be unavailable or inaccessible';
       }
     }
-    
+
     this.observer.unobserve(element);
   }
 
@@ -173,6 +173,21 @@ export class FaviconLoader {
     } catch (e) {
       icon.src = 'icons/default-favicon.png';
     }
+  }
+
+  /**
+   * Refresh all favicons
+   */
+  refreshAllFavicons() {
+    this.iconCache.clear();
+    this.failedHosts.clear();
+    siteChecker.clearCache();
+
+    document.querySelectorAll('.bookmark-icon').forEach(icon => {
+      icon.dataset.loaded = 'false';
+      icon.src = this.defaultIcon;
+      this.observer.observe(icon);
+    });
   }
 
   destroy() {
