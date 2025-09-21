@@ -60,6 +60,17 @@ export class ModalManager {
             <label for="bookmarkUrl">URL</label>
             <input type="url" id="bookmarkUrl" required>
           </div>
+          <div class="form-group">
+            <label for="bookmarkFaviconUrl">Favicon URL (optional)</label>
+            <input type="url" id="bookmarkFaviconUrl" placeholder="https://api.xinac.net/icon/?url=https://www.google.com">
+            <small class="form-help">Custom favicon URL for this bookmark</small>
+            <small class="form-help">💡 https://api.xinac.net/icon is a good place to fetch favicon, e.g. https://api.xinac.net/icon/?url=https://www.google.com</small>
+          </div>
+          <div class="form-group">
+            <label for="bookmarkEmoji">Emoji (optional)</label>
+            <input type="text" id="bookmarkEmoji" placeholder="🔖" maxlength="4">
+            <small class="form-help">Use emoji as favicon (takes priority over URL)</small>
+          </div>
           <div class="form-actions">
             <button type="button" class="btn-cancel">Cancel</button>
             <button type="submit" class="btn-save">Save</button>
@@ -71,9 +82,11 @@ export class ModalManager {
     // Add keyboard event handling
     const titleInput = modal.querySelector('#bookmarkTitle');
     const urlInput = modal.querySelector('#bookmarkUrl');
+    const faviconUrlInput = modal.querySelector('#bookmarkFaviconUrl');
+    const emojiInput = modal.querySelector('#bookmarkEmoji');
 
     // Prevent backspace key from triggering history navigation in input fields
-    [titleInput, urlInput].forEach(input => {
+    [titleInput, urlInput, faviconUrlInput, emojiInput].forEach(input => {
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Backspace' && !e.target.value) {
           e.preventDefault();
@@ -115,16 +128,24 @@ export class ModalManager {
     const form = modal.querySelector('#editBookmarkForm');
     const titleInput = modal.querySelector('#bookmarkTitle');
     const urlInput = modal.querySelector('#bookmarkUrl');
+    const faviconUrlInput = modal.querySelector('#bookmarkFaviconUrl');
+    const emojiInput = modal.querySelector('#bookmarkEmoji');
 
-    // Fill current values
-    titleInput.value = bookmark.title;
+    // Extract custom favicon data first
+    const customFaviconData = this.extractCustomFaviconData(bookmark);
+
+    // Fill current values - use clean title for editing
+    const { cleanTitle } = this.parseTitle(bookmark.title);
+    titleInput.value = cleanTitle || bookmark.title;
     urlInput.value = bookmark.url;
+    faviconUrlInput.value = customFaviconData.faviconUrl || '';
+    emojiInput.value = customFaviconData.emoji || '';
 
     // Bind form submit event
     form.onsubmit = async (e) => {
       e.preventDefault();
       await this.handleBookmarkEdit(bookmark.id, {
-        title: titleInput.value,
+        title: this.buildTitleWithFaviconData(titleInput.value, faviconUrlInput.value, emojiInput.value),
         url: urlInput.value
       });
     };
@@ -439,6 +460,67 @@ export class ModalManager {
         console.error('Error closing modal:', error);
       }
     }
+  }
+
+  /**
+   * Extract custom favicon data from bookmark
+   * @param {Object} bookmark Bookmark data
+   * @returns {Object} Custom favicon data { faviconUrl, emoji }
+   */
+  extractCustomFaviconData(bookmark) {
+    const result = { faviconUrl: '', emoji: '' };
+
+    // Check if title contains favicon metadata in format: [favicon:url] or [emoji:🔖]
+    const faviconUrlMatch = bookmark.title.match(/\[favicon:(https?:\/\/[^\]]+)\]/);
+    const emojiMatch = bookmark.title.match(/\[emoji:([^\]]+)\]/);
+
+    if (faviconUrlMatch) {
+      result.faviconUrl = faviconUrlMatch[1];
+    }
+
+    if (emojiMatch) {
+      result.emoji = emojiMatch[1];
+    }
+
+    return result;
+  }
+
+  /**
+   * Parse title to remove favicon metadata and tags (simplified version)
+   * @param {string} title Bookmark title
+   * @returns {Object} Object with cleanTitle
+   */
+  parseTitle(title) {
+    if (!title) {
+      return { cleanTitle: '' };
+    }
+
+    // Remove tags and favicon metadata from title
+    let cleanTitle = title.replace(/#\w+/g, '').trim();
+    cleanTitle = cleanTitle.replace(/\[favicon:[^\]]+\]/g, '').replace(/\[emoji:[^\]]+\]/g, '').trim();
+
+    return { cleanTitle };
+  }
+
+  /**
+   * Build title with favicon data embedded
+   * @param {string} cleanTitle Clean title without metadata
+   * @param {string} faviconUrl Custom favicon URL
+   * @param {string} emoji Custom emoji
+   * @returns {string} Title with embedded favicon data
+   */
+  buildTitleWithFaviconData(cleanTitle, faviconUrl, emoji) {
+    // Start with clean title (remove existing favicon metadata)
+    let title = cleanTitle.replace(/\[favicon:[^\]]+\]/g, '').replace(/\[emoji:[^\]]+\]/g, '').trim();
+
+    // Add favicon metadata
+    if (emoji && emoji.trim()) {
+      title += ` [emoji:${emoji.trim()}]`;
+    } else if (faviconUrl && faviconUrl.trim()) {
+      title += ` [favicon:${faviconUrl.trim()}]`;
+    }
+
+    return title;
   }
 
   /**

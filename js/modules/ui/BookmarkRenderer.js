@@ -42,7 +42,9 @@ export class BookmarkRenderer {
     // Create favicon element
     const favicon = createElement('img', 'bookmark-icon');
     favicon.setAttribute('data-hostname', getDomain(bookmark.url));
-    faviconLoader.loadIcon(favicon, getDomain(bookmark.url));
+
+    // Handle custom favicon logic
+    this.setCustomFavicon(favicon, bookmark);
 
     const textContainer = createElement('div', 'bookmark-text-container');
 
@@ -130,6 +132,91 @@ export class BookmarkRenderer {
   }
 
   /**
+   * Set custom favicon for bookmark
+   * @param {HTMLImageElement} faviconElement Favicon element
+   * @param {Object} bookmark Bookmark data
+   */
+  setCustomFavicon(faviconElement, bookmark) {
+    // Extract custom favicon data from bookmark title
+    const customFaviconData = this.extractCustomFaviconData(bookmark);
+
+    // Priority: emoji > custom favicon URL > default favicon loading
+    if (customFaviconData.emoji) {
+      // Convert emoji to data URL
+      faviconElement.src = this.emojiToDataUrl(customFaviconData.emoji);
+      faviconElement.dataset.loaded = 'true';
+      faviconElement.dataset.customFavicon = 'emoji';
+    } else if (customFaviconData.faviconUrl) {
+      // Use custom favicon URL
+      faviconElement.src = customFaviconData.faviconUrl;
+      faviconElement.dataset.loaded = 'true';
+      faviconElement.dataset.customFavicon = 'url';
+
+      // Add error handler to fall back to default loading
+      faviconElement.onerror = () => {
+        faviconElement.dataset.loaded = 'false';
+        faviconLoader.loadIcon(faviconElement, getDomain(bookmark.url));
+      };
+    } else {
+      // Use default favicon loading
+      faviconLoader.loadIcon(faviconElement, getDomain(bookmark.url));
+    }
+  }
+
+  /**
+   * Extract custom favicon data from bookmark title
+   * @param {Object} bookmark Bookmark data
+   * @returns {Object} Custom favicon data { faviconUrl, emoji }
+   */
+  extractCustomFaviconData(bookmark) {
+    const result = { faviconUrl: '', emoji: '' };
+
+    // Check if title contains favicon metadata
+    const faviconUrlMatch = bookmark.title.match(/\[favicon:(https?:\/\/[^\]]+)\]/);
+    const emojiMatch = bookmark.title.match(/\[emoji:([^\]]+)\]/);
+
+    if (faviconUrlMatch) {
+      result.faviconUrl = faviconUrlMatch[1];
+    }
+
+    if (emojiMatch) {
+      result.emoji = emojiMatch[1];
+    }
+
+    return result;
+  }
+
+  /**
+   * Convert emoji to data URL for use as favicon
+   * @param {string} emoji Emoji character
+   * @returns {string} Data URL
+   */
+  emojiToDataUrl(emoji) {
+    // Create canvas to render emoji
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Use higher resolution for crisp emoji display
+    const size = 40;
+    const scale = 2; // 2x for high DPI displays
+    canvas.width = size * scale;
+    canvas.height = size * scale;
+    canvas.style.width = size + 'px';
+    canvas.style.height = size + 'px';
+
+    // Scale the context for high DPI
+    ctx.scale(scale, scale);
+
+    // Set font and draw emoji - use system emoji font
+    ctx.font = '28px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, size/2, size/2);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  /**
    * Remove single bookmark element
    * @param {string} bookmarkId Bookmark ID to remove
    */
@@ -172,4 +259,3 @@ export class BookmarkRenderer {
     return empty;
   }
 }
-

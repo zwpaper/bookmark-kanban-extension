@@ -80,7 +80,11 @@ export const parseTitle = (title) => {
   }
   const tagRegex = /#\w+/g;
   const tags = title.match(tagRegex) || [];
-  const cleanTitle = title.replace(tagRegex, '').trim();
+
+  // Remove tags and favicon metadata from title
+  let cleanTitle = title.replace(tagRegex, '').trim();
+  cleanTitle = cleanTitle.replace(/\[favicon:[^\]]+\]/g, '').replace(/\[emoji:[^\]]+\]/g, '').trim();
+
   return { cleanTitle, tags };
 };
 
