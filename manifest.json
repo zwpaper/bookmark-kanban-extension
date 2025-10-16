@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Bookmark Kanban",
-  "short_name": "BookmarkKanban",
+  "name": "Kanban Mark",
+  "short_name": "KanbanMark",
   "version": "1.2.3",
   "description": "Organize bookmarks in a visual kanban board. Simple, intuitive management with drag-and-drop functionality.",
   "author": "Chen Yifeng",

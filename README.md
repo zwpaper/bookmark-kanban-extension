@@ -1,12 +1,12 @@
-# Bookmark Kanban
+# Kanban Mark
 
 A Chrome extension that displays your bookmarks in a visual kanban board layout, making it easier to organize and manage your bookmarks.
 
-![Bookmark Kanban Screenshot](screenshots/screenshot-1.jpg)
-![Bookmark Kanban Screenshot](screenshots/screenshot-2.jpg)
-![Bookmark Kanban Screenshot](screenshots/screenshot-3.jpg)
-![Bookmark Kanban Screenshot](screenshots/screenshot-4.jpg)
-![Bookmark Kanban Screenshot](screenshots/screenshot-5.jpg)
+![KanbanMark Screenshot](screenshots/screenshot-1.jpg)
+![KanbanMark Screenshot](screenshots/screenshot-2.jpg)
+![KanbanMark Screenshot](screenshots/screenshot-3.jpg)
+![KanbanMark Screenshot](screenshots/screenshot-4.jpg)
+![KanbanMark Screenshot](screenshots/screenshot-5.jpg)
 
 ## Features
 
@@ -81,7 +81,7 @@ The extension operates primarily by replacing your new tab page with a kanban bo
 
 ### Project Structure
 ```
-bookmark-kanban/
+kanbanmark/
 ├── js/
 │   ├── background.js        # Background service worker
 │   ├── popup.js             # Popup window script
@@ -149,7 +149,8 @@ This extension does not collect or transmit any personal data. All data is store
 ## Support
 
 If you encounter any issues or have suggestions, please:
-1. Check the [Issues](https://github.com/chenyifeng/bookmark-kanban-extension/issues) page
+
+1. Check the [Issues](https://github.com/zwpaper/kanbanmark/issues) page
 2. Create a new issue if needed
 3. Provide detailed information about the problem
 
@@ -160,78 +161,7 @@ If you encounter any issues or have suggestions, please:
 - Modern web technologies
 - Open source community
 
-## Author
+## Acknowledgment
 
-Chen Yifeng
-
-## Version History
-
-- 1.2.3
-  - Moved theme and display mode selectors to settings page
-    - Added settings button with gear icon
-    - Created settings modal dialog
-    - Improved UI layout and responsiveness
-    - Removed keyboard shortcut for settings to avoid conflicts
-
-- 1.2.2
-  - Refactored application architecture
-    - Split app.js into multiple independent modules
-    - Added AppCoordinator.js as application coordinator
-    - Added EventManager.js for event handling
-    - Added MessageHandler.js for message communication
-    - Added SiteCheckManager.js for website checking
-    - Added NotificationManager.js for notifications
-    - Optimized code organization and improved maintainability
-
-- 1.2.1
-  - Fixed layout issues
-    - Optimized kanban board layout with consistent left margin
-    - Removed unnecessary media queries for screen resolution
-    - Improved overall layout stability
-
-- 1.2.0
-  - Enhanced bookmark availability checking
-    - Replaced automatic periodic checks with manual check button
-    - Optimized checking algorithm using DNS resolution and favicon checks
-    - Added certificate error status display (yellow warning)
-    - Implemented parallel checking for improved speed
-    - Added progress indicator during checks
-    - Used session storage for check results
-    - Skipped local network address checks
-    - Added 24-hour check cache for better performance
-
-- 1.1.0
-  - Added column title editing feature with double-click interaction
-  - Added visual feedback for editable and non-editable columns
-  - Improved column header interaction with drag handle
-  - Enhanced user experience with clear feedback messages
-
-- 1.0.0
-  - Added VS Code style command palette for quick bookmark search
-  - Enhanced visual feedback for search results across all themes
-  - Improved accessibility with high contrast animations
-  - Added flexible display modes (single-line and double-line layouts)
-  - Simplified interface with clean typography
-  - Improved dark theme button styles
-  - Unified animation effects across all themes
-  - Enhanced overall user experience
-
-- 0.1.2
-  - Added theme selection feature with multiple theme options
-  - Added system theme detection and auto-switching
-  - Improved theme transition animations
-  - Added theme persistence
-
-- 0.1.1
-  - Update version number in manifest.json
-  - Update version display in popup.html
-  - Fix modal closing issue with backspace key
-
-- 0.1.0
-  - Initial release
-  - Visual kanban board for bookmarks
-  - Drag and drop functionality
-  - Bookmark management features
-  - Layout persistence
-  - Website availability checking
-  - Favicon loading and caching
+This project is developed based on [bookmark-kanban-extension](https://github.com/Mchan1970/bookmark-kanban-extension).
+The original project is licensed under the MIT License.

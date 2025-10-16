@@ -36,7 +36,7 @@ export class UIStateManager {
   showDisabledMessage() {
     this.container.innerHTML = `
       <div class="disabled-message">
-        <h2>Bookmark Kanban is disabled on new tab</h2>
+        <h2>KanbanMark is disabled on new tab</h2>
         <p>You can enable it in the extension settings.</p>
         <button id="enable-newtab" class="btn-primary">Enable on New Tab</button>
       </div>
@@ -88,7 +88,7 @@ export class UIStateManager {
       guide.classList.add('fade-out');
       setTimeout(() => {
         guide.remove();
-        
+
         // Remember that the user has seen the guide
         chrome.storage.sync.set({ dragGuideShown: true });
       }, 300);
@@ -104,4 +104,4 @@ export class UIStateManager {
       }, 300);
     }, 10000);
   }
-} 
+}

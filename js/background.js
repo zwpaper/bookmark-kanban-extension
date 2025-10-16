@@ -1,7 +1,7 @@
 /**
- * Background Service Worker for Bookmark Kanban
+ * Background Service Worker for KanbanMark
  * Copyright (c) 2025 Chen Yifeng
- * 
+ *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
@@ -61,7 +61,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true; // Will respond asynchronously
   }
-  
+
   if (message.type === 'UPDATE_BOOKMARK') {
     // Handle bookmark updates
     chrome.bookmarks.update(message.bookmarkId, message.changes, (bookmark) => {
@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  
+
   if (message.type === 'DELETE_BOOKMARK') {
     // Handle bookmark deletion
     chrome.bookmarks.removeTree(message.bookmarkId, () => {
@@ -77,7 +77,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
-  
+
   if (message.type === 'CREATE_BOOKMARK') {
     // Handle new bookmark creation
     chrome.bookmarks.create(message.bookmark, (bookmark) => {
@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'CHECK_BOOKMARKS') {
     // Manual bookmark check triggered
     _debug('Manual bookmark check triggered');
-    
+
     // Create a helper function for safe response
     const safeResponse = (data) => {
       try {
@@ -98,20 +98,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         _debug('Error sending response');
       }
     };
-    
+
     // Start check but send initial response immediately
     safeResponse({ started: true });
-    
+
     // Continue with the check
     checkAllBookmarks().then((result) => {
       _debug('Manual bookmark check completed successfully');
     }).catch(() => {
       _debug('Manual check failed');
     });
-    
+
     return false; // We already responded, no need to keep channel open
   }
-  
+
   // Return false to indicate no async response needed
   return false;
 });
@@ -164,7 +164,7 @@ chrome.bookmarks.onChanged.addListener((id, changeInfo) => {
 // Handle extension icon click
 chrome.action.onClicked.addListener((tab) => {
   // If the extension icon is clicked on a new tab page,
-  // refresh the page to update the bookmark kanban
+  // refresh the page to update the kanban board
   if (tab.url.startsWith('chrome://newtab')) {
     chrome.tabs.reload(tab.id);
   }
@@ -178,14 +178,14 @@ async function checkAllBookmarks() {
     const results = new Map();
     let total = 0;
     let checked = 0;
-    
+
     // First calculate total count
     await traverseBookmarks(bookmarks, (bookmark) => {
       if (bookmark.url) total++;
     });
-    
+
     _debug(`Found ${total} bookmarks to check`);
-    
+
     // Send start message and total count to all tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
@@ -197,7 +197,7 @@ async function checkAllBookmarks() {
         });
       });
     });
-    
+
     // Collect all bookmarks to check
     const bookmarksToCheck = [];
     await traverseBookmarks(bookmarks, (bookmark) => {
@@ -210,14 +210,14 @@ async function checkAllBookmarks() {
         }
       }
     });
-    
+
     // Process bookmarks in batches with concurrency control
     const batchSize = 30; // 增加批处理大小
     const maxConcurrent = 3; // 减少并发数，避免请求过于密集
-    
+
     for (let i = 0; i < bookmarksToCheck.length; i += batchSize) {
       const batch = bookmarksToCheck.slice(i, i + batchSize);
-      
+
       // 使用 Promise.allSettled 处理并发
       const batchResults = await Promise.allSettled(
         batch.map(async ({ bookmark, url }) => {
@@ -225,8 +225,8 @@ async function checkAllBookmarks() {
             const isAlive = await siteChecker.checkSite(url.hostname);
             results.set(bookmark.id, isAlive);
             if (isDebug) {
-              const status = isAlive === true ? '✅' : 
-                            isAlive === 'certificate-error' ? '⚠️' : 
+              const status = isAlive === true ? '✅' :
+                            isAlive === 'certificate-error' ? '⚠️' :
                             isAlive === 'no-https' ? '🔓' : '🚫';
               _debug(`${status} ${url.hostname}`);
             }
@@ -236,10 +236,10 @@ async function checkAllBookmarks() {
           }
         })
       );
-      
+
       // Update progress
       checked += batch.length;
-      
+
       // Send progress update to all tabs
       chrome.tabs.query({}, (tabs) => {
         tabs.forEach(tab => {
@@ -253,11 +253,11 @@ async function checkAllBookmarks() {
           });
         });
       });
-      
+
       // 添加小延迟，避免请求过于密集
       await new Promise(resolve => setTimeout(resolve, 200));
     }
-    
+
     // Store results in session storage
     if (chrome.storage.session) {
       try {
@@ -267,7 +267,7 @@ async function checkAllBookmarks() {
         _debug('Failed to store results in session storage');
       }
     }
-    
+
     // Send completion message to all tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
@@ -279,11 +279,11 @@ async function checkAllBookmarks() {
         });
       });
     });
-    
+
     return Object.fromEntries(results);
   } catch (error) {
     _debug('Error during bookmark check:', error);
-    
+
     // Send error message to all tabs
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {
@@ -295,7 +295,7 @@ async function checkAllBookmarks() {
         });
       });
     });
-    
+
     throw error;
   }
 }
@@ -309,4 +309,4 @@ async function traverseBookmarks(bookmarks, callback) {
       await callback(bookmark);
     }
   }
-} 
+}

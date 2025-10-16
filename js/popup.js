@@ -251,9 +251,8 @@ class PopupManager {
    */
   showAboutDialog() {
     const manifest = chrome.runtime.getManifest();
-    alert(`Bookmark Kanban v${manifest.version}\n\nA simple bookmark management tool`);
-  }
-}
+    alert(`KanbanMark v${manifest.version}\\n\\nA simple bookmark management tool`);
+  }}
 
 // Initialize popup manager
 document.addEventListener('DOMContentLoaded', () => {

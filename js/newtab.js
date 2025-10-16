@@ -3,7 +3,7 @@ import { AppCoordinator } from './AppCoordinator.js';
 import { themeManager } from './modules/themeManager.js';
 import { displayManager } from './modules/displayManager.js';
 
-console.log('Bookmark Kanban newtab.js loaded');
+console.log('KanbanMark newtab.js loaded');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', async () => {
