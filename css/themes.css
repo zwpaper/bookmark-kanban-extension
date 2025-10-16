@@ -1,144 +1,162 @@
-/* css/themes.css */
+/* css/themes.css - Modern Theme System with Enhanced Color Palettes */
 
-/* Default theme */
+/* Default theme - Modern Indigo/Slate (Professional & Sophisticated) */
 :root {
-  /* Primary color */
-  --primary-color: #2563eb;
-  --primary-light: #3b82f6;
-  --primary-dark: #1d4ed8;
+  /* Primary color - Modern Indigo */
+  --primary-color: #4f46e5;
+  --primary-light: #6366f1;
+  --primary-dark: #4338ca;
   --secondary-color: #64748b;
   --danger-color: #ef4444;
   --danger-dark: #dc2626;
   --warning-color: #f59e0b;
   --success-color: #10b981;
 
-  /* Text color */
-  --text-primary: #1e293b;
+  /* Text color - Warmer, softer tones */
+  --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-light: #64748b;
 
-  /* Background color */
-  --bg-color: #f8fafc;
-  --bg-light: #f1f5f9;
+  /* Background color - Subtle warmth */
+  --bg-color: #fafaf9;
+  --bg-light: #f5f5f4;
   --card-bg: #ffffff;
 
-  /* Border */
-  --border-color: #e2e8f0;
-  --border-light: #cbd5e1;
-  --border-hover: #94a3b8;
+  /* Border - Softer, more refined */
+  --border-color: #e7e5e4;
+  --border-light: #d6d3d1;
+  --border-hover: #a8a29e;
 
   /* Corner */
-  --border-radius: 8px;
-  --border-radius-lg: 12px;
+  --border-radius: 12px;
+  --border-radius-lg: 16px;
 
-  /* Shadow */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  /* Shadow - More pronounced for depth */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.08);
 
   /* Animation */
-  --transition: all 0.3s ease;
-  --transition-fast: all 0.2s ease;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark theme */
+body {
+  background: linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #e7e5e4 100%);
+}
+
+/* Dark theme - Premium Dark Mode with Blue Accents */
 [data-theme="dark"] {
-  /* Primary color */
-  --primary-color: #1e293b;
-  --primary-light: #6366f1;
-  --primary-dark: #3730a3;
+  /* Primary color - Vibrant blue for contrast */
+  --primary-color: #3b82f6;
+  --primary-light: #60a5fa;
+  --primary-dark: #2563eb;
   --secondary-color: #64748b;
-  --danger-color: #dc2626;
-  --danger-dark: #b91c1c;
-  --warning-color: #d97706;
-  --success-color: #059669;
+  --danger-color: #f87171;
+  --danger-dark: #ef4444;
+  --warning-color: #fbbf24;
+  --success-color: #34d399;
 
   /* Text color */
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-light: #64748b;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-light: #94a3b8;
 
-  /* Background color */
-  --bg-color: #0f172a;
-  --bg-light: #1e293b;
+  /* Background color - Deep, rich dark */
+  --bg-color: #0c1220;
+  --bg-light: #1a1f2e;
   --card-bg: #1e293b;
 
   /* Border */
-  --border-color: #334155;
+  --border-color: #2d3748;
   --border-light: #475569;
   --border-hover: #64748b;
 
-  /* Shadow */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.24);
+  /* Shadow - Deeper shadows for depth */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.6);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.7), 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.7), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.6);
 }
 
-/* Green theme */
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #0c1220 0%, #1a1f2e 50%, #0f172a 100%);
+}
+
+/* Green theme - Fresh & Energetic (Mint/Teal) */
 [data-theme="green"] {
-  /* Primary color */
-  --primary-color: #10b981;
-  --primary-light: #34d399;
-  --primary-dark: #059669;
-  --secondary-color: #6b7280;
+  /* Primary color - Modern teal/emerald */
+  --primary-color: #0d9488;
+  --primary-light: #14b8a6;
+  --primary-dark: #0f766e;
+  --secondary-color: #64748b;
   --danger-color: #ef4444;
   --danger-dark: #dc2626;
   --warning-color: #f59e0b;
   --success-color: #10b981;
 
   /* Text color */
-  --text-primary: #1f2937;
-  --text-secondary: #4b5563;
-  --text-light: #6b7280;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-light: #64748b;
 
-  /* Background color */
-  --bg-color: #f0fdf4;
-  --bg-light: #dcfce7;
+  /* Background color - Cool mint */
+  --bg-color: #f0fdfa;
+  --bg-light: #ccfbf1;
   --card-bg: #ffffff;
 
-  /* Border */
-  --border-color: #bbf7d0;
-  --border-light: #86efac;
-  --border-hover: #4ade80;
+  /* Border - Teal tints */
+  --border-color: #99f6e4;
+  --border-light: #5eead4;
+  --border-hover: #2dd4bf;
 }
 
-/* Purple theme */
+[data-theme="green"] body {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%);
+}
+
+/* Purple theme - Minimal & Elegant */
 [data-theme="purple"] {
-  /* Primary color */
+  /* Primary color - Softer purple */
   --primary-color: #8b5cf6;
   --primary-light: #a78bfa;
   --primary-dark: #7c3aed;
-  --secondary-color: #6b7280;
+  --secondary-color: #64748b;
   --danger-color: #ef4444;
   --danger-dark: #dc2626;
   --warning-color: #f59e0b;
   --success-color: #10b981;
 
   /* Text color */
-  --text-primary: #1f2937;
-  --text-secondary: #4b5563;
-  --text-light: #6b7280;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-light: #64748b;
 
-  /* Background color */
-  --bg-color: #f5f3ff;
-  --bg-light: #ede9fe;
+  /* Background color - Barely-there purple */
+  --bg-color: #fdfbff;
+  --bg-light: #faf5ff;
   --card-bg: #ffffff;
 
-  /* Border */
-  --border-color: #ddd6fe;
-  --border-light: #c4b5fd;
-  --border-hover: #a78bfa;
+  /* Border - Subtle purple */
+  --border-color: #f3e8ff;
+  --border-light: #e9d5ff;
+  --border-hover: #d8b4fe;
 }
 
-/* High contrast theme */
+[data-theme="purple"] body {
+  background: linear-gradient(135deg, #fdfbff 0%, #faf5ff 50%, #f5f3ff 100%);
+}
+
+/* High contrast theme - Accessibility focused */
 [data-theme="high-contrast"] {
-  /* Primary color - used for header background */
+  /* Primary color */
   --primary-color: #000000;
   --primary-light: #000000;
   --primary-dark: #000000;
   --secondary-color: #000000;
-  --danger-color: #ff0000;
-  --danger-dark: #ff0000;
+  --danger-color: #cc0000;
+  --danger-dark: #aa0000;
   --warning-color: #ff6600;
   --success-color: #008000;
 
@@ -158,7 +176,175 @@
   --border-hover: #000000;
 
   /* Shadow */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
-  --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 8px 0 rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.7);
+  --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.7);
+  --shadow-md: 0 4px 8px 0 rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 8px 16px 0 rgba(0, 0, 0, 0.7);
 }
+
+[data-theme="high-contrast"] body {
+  background: #ffffff;
+}
+
+[data-theme="high-contrast"] .kanban-column {
+  border-width: 2px;
+}
+
+/* Ocean theme - NEW: Calm & Professional (Blue/Cyan) */
+[data-theme="ocean"] {
+  /* Primary color - Ocean blue */
+  --primary-color: #0891b2;
+  --primary-light: #06b6d4;
+  --primary-dark: #0e7490;
+  --secondary-color: #64748b;
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --warning-color: #f59e0b;
+  --success-color: #10b981;
+
+  /* Text color */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-light: #64748b;
+
+  /* Background color - Ocean breeze */
+  --bg-color: #f0f9ff;
+  --bg-light: #e0f2fe;
+  --card-bg: #ffffff;
+
+  /* Border - Sky blue */
+  --border-color: #bae6fd;
+  --border-light: #7dd3fc;
+  --border-hover: #38bdf8;
+}
+
+[data-theme="ocean"] body {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
+}
+
+/* Sunset theme - NEW: Warm & Inviting (Coral/Orange) */
+[data-theme="sunset"] {
+  /* Primary color - Warm coral */
+  --primary-color: #f97316;
+  --primary-light: #fb923c;
+  --primary-dark: #ea580c;
+  --secondary-color: #64748b;
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --warning-color: #f59e0b;
+  --success-color: #10b981;
+
+  /* Text color */
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-light: #78716c;
+
+  /* Background color - Peachy warm */
+  --bg-color: #fff7ed;
+  --bg-light: #ffedd5;
+  --card-bg: #ffffff;
+
+  /* Border - Peach tones */
+  --border-color: #fed7aa;
+  --border-light: #fdba74;
+  --border-hover: #fb923c;
+}
+
+[data-theme="sunset"] body {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%);
+}
+
+/* Rose theme - NEW: Modern & Elegant (Pink/Rose) */
+[data-theme="rose"] {
+  /* Primary color - Modern rose */
+  --primary-color: #f43f5e;
+  --primary-light: #fb7185;
+  --primary-dark: #e11d48;
+  --secondary-color: #64748b;
+  --danger-color: #ef4444;
+  --danger-dark: #dc2626;
+  --warning-color: #f59e0b;
+  --success-color: #10b981;
+
+  /* Text color */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-light: #64748b;
+
+  /* Background color - Soft rose */
+  --bg-color: #fff1f2;
+  --bg-light: #ffe4e6;
+  --card-bg: #ffffff;
+
+  /* Border - Rose tints */
+  --border-color: #fecdd3;
+  --border-light: #fda4af;
+  --border-hover: #fb7185;
+}
+
+[data-theme="rose"] body {
+  background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%);
+}
+
+/* Theme-specific header adjustments */
+[data-theme="dark"] #current-time,
+[data-theme="dark"] #current-date {
+  color: var(--text-primary);
+}
+
+/* Gradient text for theme headers */
+.header-left h1 {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="high-contrast"] .header-left h1 {
+  color: #000000;
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+/* Settings group heading colors per theme */
+.settings-group h3 {
+  color: var(--primary-color);
+}
+
+[data-theme="dark"] .settings-group h3 {
+  color: var(--primary-light);
+}
+
+[data-theme="high-contrast"] .settings-group h3 {
+  color: var(--text-primary);
+}
+
+/* Enhanced glass-morphism for cards in light themes */
+:root .kanban-column {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .kanban-column {
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Smooth color transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Preserve transform transitions */
+.bookmark-item,
+.kanban-column,
+.header-button,
+.action-btn,
+button {
+  transition-property: background-color, border-color, color, transform, box-shadow;
+}
+
